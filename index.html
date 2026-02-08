@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>紙ちぎり握力チェッカー</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, 'Hiragino Kaku Gothic ProN', 'メイリオ', sans-serif;
+      background: #f5f5f5;
+      color: #333;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .header h1 {
+      font-size: 1.6rem;
+      font-weight: 900;
+      margin-bottom: 0.3rem;
+    }
+
+    .header .sub {
+      font-size: 0.85rem;
+      color: #888;
+    }
+
+    /* Input */
+    .input-area {
+      background: #fff;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      padding: 1.5rem;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .input-area label {
+      display: block;
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .input-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .sheets-input {
+      width: 100px;
+      height: 52px;
+      font-size: 1.8rem;
+      font-weight: 900;
+      text-align: center;
+      border: 2px solid #ccc;
+      border-radius: 6px;
+      outline: none;
+      font-family: inherit;
+    }
+
+    .sheets-input:focus {
+      border-color: #e74c3c;
+    }
+
+    .unit {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #666;
+    }
+
+    .check-btn {
+      background: #e74c3c;
+      color: #fff;
+      border: none;
+      padding: 0.8rem 2rem;
+      border-radius: 6px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+    }
+
+    .check-btn:hover {
+      background: #c0392b;
+    }
+
+    .check-btn:active {
+      background: #a93226;
+    }
+
+    /* Results */
+    .results {
+      display: none;
+    }
+
+    .results.show {
+      display: block;
+    }
+
+    .result-box {
+      background: #fff;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .result-box .label {
+      font-size: 0.8rem;
+      color: #999;
+      margin-bottom: 0.3rem;
+    }
+
+    /* Grip */
+    .grip-num {
+      font-size: 3.5rem;
+      font-weight: 900;
+      color: #e74c3c;
+      line-height: 1.1;
+    }
+
+    .grip-kg {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #999;
+    }
+
+    .grip-bar-wrap {
+      margin-top: 1rem;
+      background: #eee;
+      border-radius: 4px;
+      height: 16px;
+      overflow: hidden;
+    }
+
+    .grip-bar {
+      height: 100%;
+      border-radius: 4px;
+      background: #e74c3c;
+      transition: width 1s ease;
+      width: 0%;
+    }
+
+    .grip-bar-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.7rem;
+      color: #bbb;
+      margin-top: 2px;
+    }
+
+    /* Animal */
+    .animal-vs {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.8rem;
+      margin: 0.8rem 0;
+    }
+
+    .animal-vs .you {
+      font-size: 2.2rem;
+      position: relative;
+      display: inline-block;
+    }
+
+    .animal-vs .you .you-l {
+      display: inline-block;
+    }
+
+    .animal-vs .you .you-r,
+    .animal-vs .you .you-c,
+    .animal-vs .you .you-d {
+      position: absolute;
+      left: 0;
+      top: 0;
+      display: inline-block;
+    }
+
+    .animal-vs .you .you-c,
+    .animal-vs .you .you-d {
+      display: none;
+    }
+
+    .you[class*="torn-"] .you-c,
+    .you[class*="torn-"] .you-d,
+    .you[class*="punch-"] .you-c,
+    .you[class*="punch-"] .you-d {
+      display: inline-block;
+    }
+
+    /* 左右パカッ（控えめ） */
+    .you.split-1 .you-l { clip-path: inset(0 50% 0 0); transform: translateX(-5px) rotate(-10deg); }
+    .you.split-1 .you-r { clip-path: inset(0 0 0 50%); transform: translateX(5px) rotate(10deg); }
+
+    /* 左右ガバッ（大胆） */
+    .you.split-2 .you-l { clip-path: inset(0 50% 0 0); transform: translateX(-10px) rotate(-20deg); }
+    .you.split-2 .you-r { clip-path: inset(0 0 0 50%); transform: translateX(10px) rotate(20deg); }
+
+    /* 斜め斬り（右下がり） */
+    .you.split-3 .you-l { clip-path: polygon(0 0, 65% 0, 35% 100%, 0 100%); transform: translateX(-6px) rotate(-8deg); }
+    .you.split-3 .you-r { clip-path: polygon(65% 0, 100% 0, 100% 100%, 35% 100%); transform: translateX(6px) rotate(8deg); }
+
+    /* 斜め斬り（右上がり） */
+    .you.split-4 .you-l { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); clip-path: polygon(0 0, 35% 0, 65% 100%, 0 100%); transform: translateX(-6px) rotate(8deg); }
+    .you.split-4 .you-r { clip-path: polygon(35% 0, 100% 0, 100% 100%, 65% 100%); transform: translateX(6px) rotate(-8deg); }
+
+    /* 上下真っ二つ */
+    .you.split-5 .you-l { clip-path: inset(0 0 50% 0); transform: translateY(-5px) rotate(-5deg); }
+    .you.split-5 .you-r { clip-path: inset(50% 0 0 0); transform: translateY(5px) rotate(5deg); }
+
+    /* 片方落下 */
+    .you.split-6 .you-l { clip-path: inset(0 50% 0 0); transform: rotate(-3deg); }
+    .you.split-6 .you-r { clip-path: inset(0 0 0 50%); transform: translate(8px, 12px) rotate(25deg); }
+
+    /* 吹っ飛び */
+    .you.split-7 .you-l { clip-path: inset(0 50% 0 0); transform: translate(-12px, -6px) rotate(-30deg); }
+    .you.split-7 .you-r { clip-path: inset(0 0 0 50%); transform: translate(12px, 6px) rotate(30deg); }
+
+    /* ジグザグ断裂 */
+    .you.split-8 .you-l { clip-path: polygon(0 0, 55% 0, 45% 33%, 55% 66%, 45% 100%, 0 100%); transform: translateX(-5px) rotate(-6deg); }
+    .you.split-8 .you-r { clip-path: polygon(55% 0, 100% 0, 100% 100%, 45% 100%, 55% 66%, 45% 33%); transform: translateX(5px) rotate(6deg); }
+
+    /* === ビリビリ引きちぎり === */
+
+    /* 四方にビリビリ */
+    .you.torn-1 .you-l { clip-path: polygon(0 0, 53% 0, 50% 50%, 0 47%); transform: translate(-8px, -6px) rotate(-15deg); }
+    .you.torn-1 .you-r { clip-path: polygon(53% 0, 100% 0, 100% 47%, 50% 50%); transform: translate(8px, -5px) rotate(12deg); }
+    .you.torn-1 .you-c { clip-path: polygon(0 47%, 50% 50%, 47% 100%, 0 100%); transform: translate(-6px, 7px) rotate(-10deg); }
+    .you.torn-1 .you-d { clip-path: polygon(50% 50%, 100% 47%, 100% 100%, 47% 100%); transform: translate(10px, 8px) rotate(18deg); }
+
+    /* 縦にビリビリ4枚 */
+    .you.torn-2 .you-l { clip-path: polygon(0 0, 28% 0, 25% 50%, 27% 100%, 0 100%); transform: translate(-10px, -4px) rotate(-14deg); }
+    .you.torn-2 .you-r { clip-path: polygon(28% 0, 55% 0, 52% 50%, 54% 100%, 27% 100%, 25% 50%); transform: translate(-2px, 5px) rotate(6deg); }
+    .you.torn-2 .you-c { clip-path: polygon(55% 0, 80% 0, 77% 50%, 79% 100%, 54% 100%, 52% 50%); transform: translate(3px, -3px) rotate(-4deg); }
+    .you.torn-2 .you-d { clip-path: polygon(80% 0, 100% 0, 100% 100%, 79% 100%, 77% 50%); transform: translate(10px, 3px) rotate(12deg); }
+
+    /* 大爆散 */
+    .you.torn-3 .you-l { clip-path: polygon(0 0, 52% 0, 50% 50%, 0 48%); transform: translate(-15px, -12px) rotate(-28deg); }
+    .you.torn-3 .you-r { clip-path: polygon(52% 0, 100% 0, 100% 48%, 50% 50%); transform: translate(15px, -10px) rotate(25deg); }
+    .you.torn-3 .you-c { clip-path: polygon(0 48%, 50% 50%, 48% 100%, 0 100%); transform: translate(-12px, 12px) rotate(-22deg); }
+    .you.torn-3 .you-d { clip-path: polygon(50% 50%, 100% 48%, 100% 100%, 48% 100%); transform: translate(18px, 14px) rotate(32deg); }
+
+    /* 横にビリビリ4枚 */
+    .you.torn-4 .you-l { clip-path: polygon(0 0, 100% 0, 100% 28%, 50% 26%, 0 28%); transform: translate(2px, -8px) rotate(-7deg); }
+    .you.torn-4 .you-r { clip-path: polygon(0 28%, 50% 26%, 100% 28%, 100% 55%, 50% 53%, 0 55%); transform: translate(-3px, 2px) rotate(5deg); }
+    .you.torn-4 .you-c { clip-path: polygon(0 55%, 50% 53%, 100% 55%, 100% 80%, 50% 78%, 0 80%); transform: translate(4px, -1px) rotate(-3deg); }
+    .you.torn-4 .you-d { clip-path: polygon(0 80%, 50% 78%, 100% 80%, 100% 100%, 0 100%); transform: translate(-2px, 8px) rotate(6deg); }
+
+    /* X字にビリビリ */
+    .you.torn-5 .you-l { clip-path: polygon(0 0, 100% 0, 50% 50%); transform: translate(0, -8px) rotate(-10deg); }
+    .you.torn-5 .you-r { clip-path: polygon(100% 0, 100% 100%, 50% 50%); transform: translate(8px, 0) rotate(8deg); }
+    .you.torn-5 .you-c { clip-path: polygon(100% 100%, 0 100%, 50% 50%); transform: translate(0, 8px) rotate(10deg); }
+    .you.torn-5 .you-d { clip-path: polygon(0 100%, 0 0, 50% 50%); transform: translate(-8px, 0) rotate(-8deg); }
+
+    /* 不規則にバラバラ */
+    .you.torn-6 .you-l { clip-path: polygon(0 0, 60% 0, 40% 45%, 0 35%); transform: translate(-10px, -8px) rotate(-18deg); }
+    .you.torn-6 .you-r { clip-path: polygon(60% 0, 100% 0, 100% 55%, 40% 45%); transform: translate(12px, -6px) rotate(15deg); }
+    .you.torn-6 .you-c { clip-path: polygon(40% 45%, 100% 55%, 100% 100%, 55% 100%); transform: translate(4px, 10px) rotate(8deg); }
+    .you.torn-6 .you-d { clip-path: polygon(0 35%, 40% 45%, 55% 100%, 0 100%); transform: translate(-8px, 8px) rotate(-12deg); }
+
+    /* === 顔面殴打（中心めり込み） === */
+
+    /* 正面からドン */
+    .you.punch-1 .you-l { clip-path: polygon(0 0, 50% 0, 50% 50%, 0 50%); transform: perspective(250px) rotateY(-8deg) rotateX(-8deg); transform-origin: top left; }
+    .you.punch-1 .you-r { clip-path: polygon(50% 0, 100% 0, 100% 50%, 50% 50%); transform: perspective(250px) rotateY(8deg) rotateX(-8deg); transform-origin: top right; }
+    .you.punch-1 .you-c { clip-path: polygon(0 50%, 50% 50%, 50% 100%, 0 100%); transform: perspective(250px) rotateY(-8deg) rotateX(8deg); transform-origin: bottom left; }
+    .you.punch-1 .you-d { clip-path: polygon(50% 50%, 100% 50%, 100% 100%, 50% 100%); transform: perspective(250px) rotateY(8deg) rotateX(8deg); transform-origin: bottom right; }
+
+    /* 右ストレート */
+    .you.punch-2 .you-l { clip-path: polygon(0 0, 50% 0, 50% 50%, 0 50%); transform: perspective(250px) rotateY(-4deg) rotateX(-4deg); transform-origin: top left; }
+    .you.punch-2 .you-r { clip-path: polygon(50% 0, 100% 0, 100% 50%, 50% 50%); transform: perspective(180px) rotateY(15deg) rotateX(-6deg); transform-origin: top right; }
+    .you.punch-2 .you-c { clip-path: polygon(0 50%, 50% 50%, 50% 100%, 0 100%); transform: perspective(250px) rotateY(-4deg) rotateX(4deg); transform-origin: bottom left; }
+    .you.punch-2 .you-d { clip-path: polygon(50% 50%, 100% 50%, 100% 100%, 50% 100%); transform: perspective(180px) rotateY(15deg) rotateX(6deg); transform-origin: bottom right; }
+
+    /* 上から叩き潰し */
+    .you.punch-3 .you-l { clip-path: polygon(0 0, 50% 0, 50% 50%, 0 50%); transform: perspective(180px) rotateY(-5deg) rotateX(-15deg); transform-origin: top left; }
+    .you.punch-3 .you-r { clip-path: polygon(50% 0, 100% 0, 100% 50%, 50% 50%); transform: perspective(180px) rotateY(5deg) rotateX(-15deg); transform-origin: top right; }
+    .you.punch-3 .you-c { clip-path: polygon(0 50%, 50% 50%, 50% 100%, 0 100%); transform: perspective(300px) rotateY(-3deg) rotateX(4deg); transform-origin: bottom left; }
+    .you.punch-3 .you-d { clip-path: polygon(50% 50%, 100% 50%, 100% 100%, 50% 100%); transform: perspective(300px) rotateY(3deg) rotateX(4deg); transform-origin: bottom right; }
+
+    /* アッパーカット */
+    .you.punch-4 .you-l { clip-path: polygon(0 0, 50% 0, 50% 50%, 0 50%); transform: perspective(300px) rotateY(-3deg) rotateX(-4deg); transform-origin: top left; }
+    .you.punch-4 .you-r { clip-path: polygon(50% 0, 100% 0, 100% 50%, 50% 50%); transform: perspective(300px) rotateY(3deg) rotateX(-4deg); transform-origin: top right; }
+    .you.punch-4 .you-c { clip-path: polygon(0 50%, 50% 50%, 50% 100%, 0 100%); transform: perspective(180px) rotateY(-5deg) rotateX(15deg); transform-origin: bottom left; }
+    .you.punch-4 .you-d { clip-path: polygon(50% 50%, 100% 50%, 100% 100%, 50% 100%); transform: perspective(180px) rotateY(5deg) rotateX(15deg); transform-origin: bottom right; }
+
+    /* 左フック */
+    .you.punch-5 .you-l { clip-path: polygon(0 0, 50% 0, 50% 50%, 0 50%); transform: perspective(180px) rotateY(-15deg) rotateX(-6deg); transform-origin: top left; }
+    .you.punch-5 .you-r { clip-path: polygon(50% 0, 100% 0, 100% 50%, 50% 50%); transform: perspective(250px) rotateY(4deg) rotateX(-4deg); transform-origin: top right; }
+    .you.punch-5 .you-c { clip-path: polygon(0 50%, 50% 50%, 50% 100%, 0 100%); transform: perspective(180px) rotateY(-15deg) rotateX(6deg); transform-origin: bottom left; }
+    .you.punch-5 .you-d { clip-path: polygon(50% 50%, 100% 50%, 100% 100%, 50% 100%); transform: perspective(250px) rotateY(4deg) rotateX(4deg); transform-origin: bottom right; }
+
+    /* めり込みパンチ */
+    .you.punch-6 .you-l { clip-path: polygon(0 0, 50% 0, 50% 50%, 0 50%); transform: perspective(130px) rotateY(-15deg) rotateX(-15deg); transform-origin: top left; }
+    .you.punch-6 .you-r { clip-path: polygon(50% 0, 100% 0, 100% 50%, 50% 50%); transform: perspective(130px) rotateY(15deg) rotateX(-15deg); transform-origin: top right; }
+    .you.punch-6 .you-c { clip-path: polygon(0 50%, 50% 50%, 50% 100%, 0 100%); transform: perspective(130px) rotateY(-15deg) rotateX(15deg); transform-origin: bottom left; }
+    .you.punch-6 .you-d { clip-path: polygon(50% 50%, 100% 50%, 100% 100%, 50% 100%); transform: perspective(130px) rotateY(15deg) rotateX(15deg); transform-origin: bottom right; }
+
+    .animal-vs .vs {
+      font-weight: 900;
+      font-size: 1rem;
+      color: #e74c3c;
+    }
+
+    .animal-vs .them {
+      font-size: 2.2rem;
+    }
+
+    .animal-name {
+      font-size: 1.5rem;
+      font-weight: 900;
+    }
+
+    .animal-grip-tag {
+      display: inline-block;
+      background: #f0f0f0;
+      padding: 0.2rem 0.8rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #666;
+      margin: 0.4rem 0;
+    }
+
+
+    .animal-trivia {
+      font-size: 0.8rem;
+      color: #666;
+      margin-top: 0.6rem;
+      padding: 0.5rem 0.8rem;
+      background: #f9f9f9;
+      border-radius: 4px;
+      text-align: center;
+      font-style: italic;
+      line-height: 1.5;
+    }
+
+    .animal-deaths {
+      font-size: 0.75rem;
+      color: #999;
+      margin-top: 0.4rem;
+    }
+
+    /* Actions */
+    .actions {
+      display: flex;
+      gap: 0.8rem;
+      justify-content: center;
+      margin-top: 0.5rem;
+    }
+
+    .retry-btn, .share-btn {
+      padding: 0.6rem 1.2rem;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+    }
+
+    .retry-btn {
+      background: #fff;
+      border: 2px solid #ddd;
+      color: #666;
+    }
+
+    .retry-btn:hover {
+      border-color: #999;
+    }
+
+    .share-btn {
+      background: #333;
+      border: none;
+      color: #fff;
+    }
+
+    .share-btn:hover {
+      background: #555;
+    }
+
+    .copied-toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #333;
+      color: #fff;
+      padding: 0.6rem 1.2rem;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      transition: transform 0.3s;
+      z-index: 100;
+    }
+
+    .copied-toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 2rem;
+      font-size: 0.75rem;
+      color: #bbb;
+    }
+
+    @media (max-width: 480px) {
+      .header h1 { font-size: 1.3rem; }
+      .grip-num { font-size: 2.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header class="header">
+      <h1>紙ちぎり握力チェッカー</h1>
+      <div class="sub">紙をちぎった枚数から握力を推定します</div>
+    </header>
+
+    <div class="input-area">
+      <label>何枚ちぎった？</label>
+      <div class="input-row">
+        <input type="number" class="sheets-input" id="sheetsInput" min="1" max="999" step="1" placeholder="?">
+        <span class="unit">枚</span>
+      </div>
+      <button class="check-btn" onclick="checkGrip()">診断する</button>
+    </div>
+
+    <div class="results" id="results">
+
+      <div class="result-box">
+        <div class="label">推定握力</div>
+        <div>
+          <span class="grip-num" id="gripValue">0</span>
+          <span class="grip-kg">kg</span>
+        </div>
+        <div class="grip-bar-wrap">
+          <div class="grip-bar" id="gripBar"></div>
+        </div>
+        <div class="grip-bar-labels">
+          <span>0</span>
+          <span>成人平均(40kg)</span>
+          <span>100+</span>
+        </div>
+      </div>
+
+      <div class="result-box">
+        <div class="label">ぎりぎり負ける動物</div>
+        <div class="animal-vs">
+          <span class="you split-1"><span class="you-l">🧑</span><span class="you-r">🧑</span><span class="you-c">🧑</span><span class="you-d">🧑</span></span>
+          <span class="vs">VS</span>
+          <span class="them" id="animalEmoji">🐱</span>
+        </div>
+        <div class="animal-name" id="animalName">ネコ</div>
+        <div class="animal-grip-tag" id="animalGrip">握力 5kg</div>
+        <div class="animal-trivia" id="animalTrivia"></div>
+        <div class="animal-deaths" id="animalDeaths"></div>
+      </div>
+
+      <div class="actions">
+        <button class="retry-btn" onclick="retry()">もう1回</button>
+        <button class="share-btn" onclick="shareResult()">結果をコピー</button>
+      </div>
+    </div>
+
+    <footer class="footer"></footer>
+  </div>
+
+  <div class="copied-toast" id="copiedToast">コピーした</div>
+
+  <script>
+    const animalTiers = [
+      { min: 0, max: 5, animals: [
+        { name: 'テントウムシ', emoji: '🐞', grip: 0.5, deaths: 0 },
+        { name: 'カタツムリ', emoji: '🐌', grip: 1, deaths: 0 },
+        { name: 'カエル', emoji: '🐸', grip: 1, deaths: 0 },
+        { name: 'ヤモリ', emoji: '🦎', grip: 2, deaths: 0 },
+        { name: 'カブトムシ', emoji: '🪲', grip: 2, deaths: 0 },
+        { name: 'ハリネズミ', emoji: '🦔', grip: 2, deaths: 0 },
+        { name: 'ハムスター', emoji: '🐹', grip: 3, deaths: 0 },
+        { name: 'ザリガニ', emoji: '🦞', grip: 3, deaths: 0 },
+        { name: 'リス', emoji: '🐿️', grip: 4, deaths: 0 },
+        { name: 'カメ', emoji: '🐢', grip: 5, deaths: 0 },
+      ]},
+      { min: 5, max: 15, animals: [
+        { name: 'ウサギ', emoji: '🐰', grip: 6, deaths: 0 },
+        { name: 'コウモリ', emoji: '🦇', grip: 6, deaths: 0 },
+        { name: 'ニワトリ', emoji: '🐔', grip: 7, deaths: 0 },
+        { name: 'ペンギン', emoji: '🐧', grip: 7, deaths: 0 },
+        { name: 'ネコ', emoji: '🐱', grip: 8, deaths: 0 },
+        { name: 'カニ', emoji: '🦀', grip: 8, deaths: 0 },
+        { name: 'カワウソ', emoji: '🦦', grip: 10, deaths: 0 },
+        { name: 'アライグマ', emoji: '🦝', grip: 10, deaths: 0 },
+        { name: 'ナマケモノ', emoji: '🦥', grip: 12, deaths: 0 },
+        { name: 'キツネ', emoji: '🦊', grip: 14, deaths: 0 },
+      ]},
+      { min: 15, max: 35, animals: [
+        { name: 'コアラ', emoji: '🐨', grip: 18, deaths: 0 },
+        { name: 'ヒツジ', emoji: '🐑', grip: 20, deaths: 0 },
+        { name: '柴犬', emoji: '🐕', grip: 22, deaths: 0 },
+        { name: 'ロブスター', emoji: '🦞', grip: 25, deaths: 0 },
+        { name: 'ビーバー', emoji: '🦫', grip: 25, deaths: 1 },
+        { name: 'ヤギ', emoji: '🐐', grip: 27, deaths: 0 },
+        { name: 'イノシシ', emoji: '🐗', grip: 28, deaths: 10 },
+        { name: 'タカ', emoji: '🦅', grip: 30, deaths: 0 },
+        { name: 'フクロウ', emoji: '🦉', grip: 30, deaths: 0 },
+        { name: 'タコ', emoji: '🐙', grip: 32, deaths: 1 },
+      ]},
+      { min: 35, max: 60, animals: [
+        { name: 'アルパカ', emoji: '🦙', grip: 38, deaths: 0 },
+        { name: 'オオカミ', emoji: '🐺', grip: 40, deaths: 10 },
+        { name: 'シカ', emoji: '🦌', grip: 42, deaths: 5 },
+        { name: 'カンガルー', emoji: '🦘', grip: 45, deaths: 2 },
+        { name: 'ニシキヘビ', emoji: '🐍', grip: 48, deaths: 5 },
+        { name: 'パンダ', emoji: '🐼', grip: 50, deaths: 0 },
+        { name: 'ラクダ', emoji: '🐪', grip: 52, deaths: 20 },
+        { name: 'ヒョウ', emoji: '🐆', grip: 55, deaths: 50 },
+      ]},
+      { min: 60, max: 120, animals: [
+        { name: 'ワニ', emoji: '🐊', grip: 70, deaths: 1000 },
+        { name: 'ウシ', emoji: '🐮', grip: 75, deaths: 20 },
+        { name: 'シャコ', emoji: '🦐', grip: 80, deaths: 0 },
+        { name: 'ライオン', emoji: '🦁', grip: 80, deaths: 200 },
+        { name: 'ウマ', emoji: '🐴', grip: 85, deaths: 100 },
+        { name: 'アザラシ', emoji: '🦭', grip: 90, deaths: 0 },
+        { name: 'ジャガー', emoji: '🐆', grip: 95, deaths: 0 },
+        { name: 'トラ', emoji: '🐅', grip: 100, deaths: 50 },
+        { name: 'サメ', emoji: '🦈', grip: 110, deaths: 10 },
+      ]},
+      { min: 120, max: 250, animals: [
+        { name: 'ツキノワグマ', emoji: '🐻', grip: 130, deaths: 5 },
+        { name: 'クマ', emoji: '🐻', grip: 150, deaths: 10 },
+        { name: 'バイソン', emoji: '🦬', grip: 160, deaths: 3 },
+        { name: 'サイ', emoji: '🦏', grip: 180, deaths: 2 },
+        { name: 'オランウータン', emoji: '🦧', grip: 200, deaths: 0 },
+        { name: 'キリン', emoji: '🦒', grip: 210, deaths: 2 },
+        { name: 'スイギュウ', emoji: '🐃', grip: 220, deaths: 200 },
+        { name: 'カバ', emoji: '🦛', grip: 230, deaths: 500 },
+      ]},
+      { min: 250, max: 9999, animals: [
+        { name: 'チンパンジー', emoji: '🐒', grip: 270, deaths: 2 },
+        { name: 'ヤシガニ', emoji: '🦀', grip: 330, deaths: 0 },
+        { name: 'ホッキョクグマ', emoji: '🐻‍❄️', grip: 350, deaths: 1 },
+        { name: 'ゴリラ', emoji: '🦍', grip: 500, deaths: 0 },
+        { name: 'ゾウ', emoji: '🐘', grip: 700, deaths: 500 },
+        { name: 'クジラ', emoji: '🐋', grip: 900, deaths: 0 },
+      ]},
+    ];
+
+    const quotes = [
+      // 世界のことわざ
+      { text: '象を食べるには一口ずつ', author: 'コンゴのことわざ' },
+      { text: 'ラクダの鼻をテントに入れたら、やがて全身が入ってくる', author: 'アラブのことわざ' },
+      { text: '知識は重くならない荷物だ', author: 'チェコのことわざ' },
+      { text: '安い肉からうまいスープは作れない', author: 'エストニアのことわざ' },
+      { text: '急ぐカラスは巣を壊す', author: 'モンゴルのことわざ' },
+      { text: '人は死ぬまで自分の蜂蜜の味を知らない', author: 'モロッコのことわざ' },
+      { text: '一本の木では森にならない', author: 'セネガルのことわざ' },
+      { text: '靴を履いてみなければ、どこが痛いかわからない', author: 'スペインのことわざ' },
+      { text: '口を開けば歯が見える', author: '韓国のことわざ' },
+      { text: '影のない日差しはない', author: 'ハンガリーのことわざ' },
+      { text: '酢を売る者は甘い顔をする', author: 'ペルシャのことわざ' },
+      { text: '手のひらで太陽は隠せない', author: 'ギリシャのことわざ' },
+      { text: '一人の敵は多すぎるが、百人の友は少なすぎる', author: 'トルコのことわざ' },
+      { text: '真珠は砂の中から生まれる', author: 'アラビアのことわざ' },
+      { text: '食べすぎた者は空腹の者の苦しみを知らない', author: 'アイルランドのことわざ' },
+      { text: '一度噛まれた者は二度目を恐れる', author: 'スウェーデンのことわざ' },
+      { text: '良い風は良い航海をもたらす', author: 'ポルトガルのことわざ' },
+      { text: '怠け者に休日はない', author: 'フランスのことわざ' },
+      { text: 'ロバが旅に出ても、馬になって帰ることはない', author: 'トルコのことわざ' },
+      { text: '毎日卵を産む鶏を殺すな', author: 'イタリアのことわざ' },
+      { text: '風が強い日に納屋を建てるな', author: 'ナイジェリアのことわざ' },
+      { text: '知恵のある者が木に登れば実を取り、知恵のない者は枝を折る', author: 'ガーナのことわざ' },
+      { text: '寝ている犬の鼻を触るな', author: 'コンゴのことわざ' },
+      { text: '小さな斧でも繰り返せば大木を倒す', author: 'タンザニアのことわざ' },
+      { text: 'カメレオンは前を向きながら色を変える', author: 'マダガスカルのことわざ' },
+      { text: '雨が止むまで踊り続ける者もいる', author: 'ルワンダのことわざ' },
+      { text: '蜂蜜の壺を開ける前に蜂を追い払え', author: 'エチオピアのことわざ' },
+      { text: '太鼓は遠くから聞いた方が美しい', author: 'ウガンダのことわざ' },
+      { text: '月に唾を吐く者は自分の顔にそれを受ける', author: 'ナイジェリアのことわざ' },
+      { text: 'ライオンの話をすれば、尻尾が見える', author: 'ケニアのことわざ' },
+      { text: 'ラクダは自分のこぶを見ない', author: 'エジプトのことわざ' },
+      { text: '一つの花では春にならない', author: 'イランのことわざ' },
+      { text: '自分の頭のハエを追ってから、隣人のハエを追え', author: 'レバノンのことわざ' },
+      { text: '水牛の目は自分の角を見ない', author: 'インドネシアのことわざ' },
+      { text: '竹は風に折れない、曲がるのだ', author: 'ベトナムのことわざ' },
+      { text: '象の足跡に小さな足跡は隠れる', author: 'ミャンマーのことわざ' },
+      { text: '石の上に座る者は立ち上がることを先に考えよ', author: 'フィリピンのことわざ' },
+      { text: '急ぐ者は二度同じ道を歩く', author: 'ルーマニアのことわざ' },
+      { text: '怒りで寝ると後悔と目覚める', author: 'セルビアのことわざ' },
+      { text: '小さな泉が大河になる', author: 'ブルガリアのことわざ' },
+      { text: '猿は自分の尻尾が木に挟まれるまで笑う', author: 'コロンビアのことわざ' },
+      { text: '全ての指が同じ長さではないように、人もまた同じではない', author: 'アフガニスタンのことわざ' },
+      { text: '酔った者の言葉は、素面の者の考えだ', author: 'ウクライナのことわざ' },
+      { text: '一匹の羊が道を間違えると群れ全体が迷う', author: 'ジョージアのことわざ' },
+      { text: '口に蓋はできない', author: 'アルメニアのことわざ' },
+      { text: 'パンを持つ者に友は多い', author: 'アルバニアのことわざ' },
+      { text: '井戸を掘る前に水の行き先を考えろ', author: 'ウズベキスタンのことわざ' },
+      { text: '盲目の鶏でもたまに穀物を見つける', author: 'リトアニアのことわざ' },
+      { text: '借りた服では踊れない', author: 'ハイチのことわざ' },
+      { text: '針の穴からでも風は入る', author: 'ボスニアのことわざ' },
+      { text: '暗い夜でも星は光る', author: 'ラトビアのことわざ' },
+      { text: '賢者は橋を渡り、愚者は川を泳ぐ', author: 'カザフスタンのことわざ' },
+      { text: '一滴の墨が泉を汚す', author: 'アゼルバイジャンのことわざ' },
+      { text: '蟻は象を一口では食べない', author: 'ベナンのことわざ' },
+      { text: '椰子の木に登る者は、降りることも知っていなければならない', author: 'サモアのことわざ' },
+      { text: '舟を漕ぐ者だけが岸に着く', author: 'トンガのことわざ' },
+      { text: '波が高いときは潜れ', author: 'フィジーのことわざ' },
+      { text: '星を数えるな、足元の石を数えろ', author: 'マサイ族のことわざ' },
+      { text: '雷は稲妻の後に来る。だが備えるのは稲妻の前だ', author: 'ズールー族のことわざ' },
+      { text: '木を植える最良の時期は20年前だった。次に良いのは今日だ', author: 'ウガンダのことわざ' },
+      { text: '客と魚は三日目から臭い始める', author: 'ポーランドのことわざ' },
+      { text: '狼の口に数えた羊を入れるな', author: 'アルメニアのことわざ' },
+      { text: '夜明け前の暗闇が一番深い', author: 'ラオスのことわざ' },
+      { text: '自分の影を追う者は日暮れまで走る', author: 'マケドニアのことわざ' },
+      { text: '熟した果物は黙って落ちる', author: 'バングラデシュのことわざ' },
+      { text: '亀が高い場所にいたら、誰かが持ち上げたのだ', author: 'ナイジェリアのことわざ' },
+      { text: '米を炊くなら水を先に見ろ', author: 'カンボジアのことわざ' },
+      { text: '石は苔を求めず、苔が石を選ぶ', author: 'チベットのことわざ' },
+      { text: '二つの舟に片足ずつ乗せる者は溺れる', author: 'クロアチアのことわざ' },
+      { text: '蜘蛛の巣が合わされば獅子をも捕らえる', author: 'エチオピアのことわざ' },
+      { text: '川を渡ったら杖を捨てるな', author: 'ネパールのことわざ' },
+      { text: '鍋が小さければ早く沸く', author: 'アイスランドのことわざ' },
+      { text: '斧を持つ者がいても、木を知る者には勝てない', author: 'ブルキナファソのことわざ' },
+      { text: '昼寝から覚めた者が夜明けを二度見る', author: 'ソマリアのことわざ' },
+      { text: '風見鶏は風を作れない', author: 'スロベニアのことわざ' },
+      { text: '雲の上にも太陽がある、ただ見えないだけだ', author: 'フィンランドのことわざ' },
+      { text: '角を持つ者は頭突きの痛みを知っている', author: 'モザンビークのことわざ' },
+      { text: '道を知っている者は先に行け、知らない者はついて来い', author: 'タジキスタンのことわざ' },
+      { text: '真っすぐな木は最初に切られる', author: '中国雲南省のことわざ' },
+      { text: '鶏が鳴く前に起きる者は、鶏よりも賢い', author: 'カメルーンのことわざ' },
+      { text: '足を洗う者は足の裏も洗え', author: 'スリランカのことわざ' },
+      { text: '壊れた太鼓は最も大きな音を立てる', author: 'マレーシアのことわざ' },
+      { text: '一本の矢は簡単に折れるが、十本束ねると折れない', author: 'モンゴルのことわざ' },
+      { text: '橋を渡る前に川の深さを測れ', author: 'パプアニューギニアのことわざ' },
+      { text: '自分の畑に水をやれ、隣の畑の雑草を数えるな', author: 'パラグアイのことわざ' },
+      { text: '黙っている犬ほど深く噛む', author: 'ノルウェーのことわざ' },
+      { text: '乾いた木は湿った木より早く燃える', author: 'ボツワナのことわざ' },
+      { text: '泉は自分の水を飲まない', author: 'ジンバブエのことわざ' },
+      { text: '二人が秘密を知れば、それはもう秘密ではない', author: 'コスタリカのことわざ' },
+      { text: '踊りを知らない者は床のせいにする', author: 'マリのことわざ' },
+      { text: '蝋燭は自分を燃やして周りを照らす', author: 'トルクメニスタンのことわざ' },
+      { text: '船の中で喧嘩する者は岸に着けない', author: 'パナマのことわざ' },
+      { text: '蛙は自分の池の水を飲み干さない', author: 'ラコタ族のことわざ' },
+      { text: '薪を割る者は二度温まる', author: 'エストニアのことわざ' },
+      { text: '鶴は一羽では飛ばない', author: 'ベラルーシのことわざ' },
+      { text: '食べきれない量を皿に盛るな', author: 'ガボンのことわざ' },
+      { text: '耳は二つあるが口は一つ、それには理由がある', author: 'キルギスのことわざ' },
+      { text: '山を動かすには小石から始めよ', author: 'トーゴのことわざ' },
+      { text: '嘘には足がないが、遠くまで歩く', author: 'スロバキアのことわざ' },
+      // 詩歌（俳句・和歌・漢詩・川柳）
+      { text: '海に出て木枯帰るところなし', author: '山口誓子' },
+      { text: '滝落ちて群青世界とどろけり', author: '水原秋桜子' },
+      { text: '炎天の地上花あり百日紅', author: '高浜虚子' },
+      { text: '噴水のしぶきの中に虹立てり', author: '日野草城' },
+      { text: '金魚玉日のさしこんでゐたりけり', author: '篠原鳳作' },
+      { text: '蟻の道雲の峰よりつづきけり', author: '小林一茶' },
+      { text: '青蛙おのれもペンキぬりたてか', author: '芥川龍之介' },
+      { text: '木がらしや目刺に残る海のいろ', author: '芥川龍之介' },
+      { text: '妻がゐて子がゐて孤独', author: '加藤楸邨' },
+      { text: '鰯雲人に告ぐべきことならず', author: '加藤楸邨' },
+      { text: '暗闇の牡丹を前に死にたくなし', author: '加藤楸邨' },
+      { text: '春月やラムネ一壜の底力', author: '永田耕衣' },
+      { text: '寒雷やびりりびりりと真夜の皿', author: '加藤楸邨' },
+      { text: '草の戸も住替る代ぞ雛の家', author: '松尾芭蕉' },
+      { text: '行く春や鳥啼き魚の目は泪', author: '松尾芭蕉' },
+      { text: '五月雨の降り残してや光堂', author: '松尾芭蕉' },
+      { text: '海暮れて鴨のこゑほのかに白し', author: '松尾芭蕉' },
+      { text: '痩馬のあわれ横たう夏野かな', author: '与謝蕪村' },
+      { text: '牡丹散りて打ちかさなりぬ二三片', author: '与謝蕪村' },
+      { text: '愁ひつつ岡にのぼれば花いばら', author: '与謝蕪村' },
+      { text: '白梅に明くる夜ばかりとなりにけり', author: '与謝蕪村' },
+      { text: '大根引き大根で道を教へけり', author: '小林一茶' },
+      { text: 'ともかくもあなた任せのとしの暮', author: '小林一茶' },
+      { text: '木曽殿と背中合せの寒さかな', author: '小林一茶' },
+      { text: '凩の果はありけり海の音', author: '池西言水' },
+      { text: '目に青葉山時鳥初松魚', author: '山口素堂' },
+      { text: '朝顔に釣瓶とられてもらひ水', author: '加賀千代女' },
+      { text: '起きて見つ寝て見つ蚊帳の広さかな', author: '加賀千代女' },
+      { text: '月の夜の水底見ゆる川辺かな', author: '内藤丈草' },
+      { text: '梅一輪一輪ほどの暖かさ', author: '服部嵐雪' },
+      { text: '吹き飛ばす石は浅間の野分かな', author: '松尾芭蕉' },
+      { text: '木枯に岩吹き尖る杉間かな', author: '松尾芭蕉' },
+      { text: '星一つ見つけて寒しうかれ女', author: '上島鬼貫' },
+      { text: '牛の子が旅に立つなり秋の雨', author: '小林一茶' },
+      { text: '夕立に走り下るや竹の蟻', author: '正岡子規' },
+      { text: '鐘撞いて見れば霧なり浮御堂', author: '正岡子規' },
+      { text: '糸瓜咲て痰のつまりし仏かな', author: '正岡子規' },
+      { text: '雨の日は雨を聴く これもまた修行', author: '種田山頭火' },
+      { text: '生死の中の雪ふりしきる', author: '種田山頭火' },
+      { text: '鉄鉢の中へも霰', author: '種田山頭火' },
+      { text: '月明の海底に水母かな', author: '日野草城' },
+      { text: '花衣ぬぐやまつはる紐いろいろ', author: '杉田久女' },
+      { text: '谺して山ほととぎすほしいまま', author: '杉田久女' },
+      { text: '足袋つぐやノラともならず教師妻', author: '杉田久女' },
+      { text: '蝶落ちて大音響の結氷期', author: '富澤赤黄男' },
+      { text: '蛾のまなこ赤光なれば海を恋ふ', author: '富澤赤黄男' },
+      { text: '梨咲くと葛飾の野はとのくもり', author: '水原秋桜子' },
+      { text: '高嶺星蚕飼の村は寝しづまり', author: '水原秋桜子' },
+      { text: '冬菊のまとふはおのが光のみ', author: '水原秋桜子' },
+      { text: '啄木鳥や落葉をいそぐ牧の木々', author: '水原秋桜子' },
+      { text: '雉子の声桃咲く里は寂しけれ', author: '室生犀星' },
+      { text: '手毬唄かなしきことをうつくしく', author: '高浜虚子' },
+      { text: '大寒の埃の如く人死ぬる', author: '高浜虚子' },
+      { text: '蟇誰かものいへ声かぎり', author: '加藤楸邨' },
+      { text: '木の葉ふりやまずいそぐないそぐなよ', author: '加藤楸邨' },
+      { text: '河よりも長き冬日の鉄橋よ', author: '山口誓子' },
+      { text: 'ピストルがプールの硬き面にひびき', author: '山口誓子' },
+      { text: '機関車の底まで蒼き冬の月', author: '山口誓子' },
+      // 和歌・短歌
+      { text: '天地のわかれし時ゆ神さびて高く貴き駿河なる富士の高嶺を', author: '山部赤人（万葉集）' },
+      { text: '東の野にかぎろひの立つ見えて返り見すれば月傾きぬ', author: '柿本人麻呂（万葉集）' },
+      { text: 'あしびきの山鳥の尾のしだり尾の長々し夜をひとりかも寝む', author: '柿本人麻呂（万葉集）' },
+      { text: '春過ぎて夏来るらし白妙の衣干したり天の香具山', author: '持統天皇（万葉集）' },
+      { text: '石走る垂水の上のさわらびの萌え出づる春になりにけるかも', author: '志貴皇子（万葉集）' },
+      { text: '銀も金も玉も何せむにまされる宝子にしかめやも', author: '山上憶良（万葉集）' },
+      { text: '験なきものを思はずは一杯の濁れる酒を飲むべくあるらし', author: '大伴旅人（万葉集）' },
+      { text: '多摩川にさらす手作りさらさらに何ぞこの児のここだ愛しき', author: '東歌（万葉集）' },
+      { text: '信濃道は今の墾道刈株に足踏ましなむ沓はけ我が背', author: '東歌（万葉集）' },
+      { text: 'あかねさす紫野行き標野行き野守は見ずや君が袖振る', author: '額田王（万葉集）' },
+      { text: '熟田津に船乗りせむと月待てば潮もかなひぬ今は漕ぎ出でな', author: '額田王（万葉集）' },
+      { text: '玉の緒よ絶えなば絶えねながらへば忍ぶることの弱りもぞする', author: '式子内親王' },
+      { text: '見渡せば花も紅葉もなかりけり浦の苫屋の秋の夕暮', author: '藤原定家' },
+      { text: 'さびしさはその色としもなかりけり槙立つ山の秋の夕暮', author: '寂蓮法師' },
+      { text: '心なき身にもあはれは知られけり鴫立つ沢の秋の夕暮', author: '西行法師' },
+      { text: '秋来ぬと目にはさやかに見えねども風の音にぞおどろかれぬる', author: '藤原敏行' },
+      { text: '世の中にたえて桜のなかりせば春の心はのどけからまし', author: '在原業平' },
+      { text: '立ち別れいなばの山の峰に生ふるまつとし聞かば今帰り来む', author: '在原行平' },
+      { text: '嘆きつつひとり寝る夜の明くる間はいかに久しきものとかは知る', author: '右大将道綱母' },
+      { text: '思ひわびさても命はあるものを憂きに堪へぬは涙なりけり', author: '道因法師' },
+      { text: '夕されば門田の稲葉おとづれて芦のまろやに秋風ぞ吹く', author: '源経信' },
+      { text: '巡り逢ひて見しやそれともわかぬ間に雲隠れにし夜半の月かな', author: '紫式部' },
+      { text: '忘らるる身をば思はず誓ひてし人の命の惜しくもあるかな', author: '右近' },
+      { text: 'ちぎりおきしさせもが露を命にてあはれ今年の秋もいぬめり', author: '藤原基俊' },
+      { text: '観覧車回れよ回れ想ひ出は君には一日我には一生', author: '栗木京子' },
+      { text: '寒いねと話しかければ寒いねと答える人のいるあたたかさ', author: '俵万智' },
+      // 漢詩
+      { text: '勧君金屈巵 満酌不須辞', author: '于武陵「勧酒」' },
+      { text: '年年歳歳花相似たり 歳歳年年人同じからず', author: '劉希夷' },
+      { text: '前不見古人 後不見来者 念天地之悠悠 独愴然而涕下', author: '陳子昂「登幽州台歌」' },
+      { text: '大江東に去く 浪は淘尽す 千古の風流人物', author: '蘇軾「赤壁懐古」' },
+      { text: '人生意気に感ず 功名誰か復た論ぜん', author: '魏徴「述懐」' },
+      { text: '故人西のかた黄鶴楼を辞し 煙花三月揚州に下る', author: '李白「黄鶴楼送孟浩然之広陵」' },
+      { text: '山は高きを以て貴しとせず 樹あるを以て貴しとす', author: '実語教' },
+      { text: '竹に上下の節あり 松に今古の色なし', author: '禅語' },
+      { text: '柳は緑 花は紅 真面目', author: '禅語' },
+      { text: '日々是好日', author: '雲門文偃' },
+      // 日本の法律の条文
+      { text: 'すべて国民は、個人として尊重される', author: '日本国憲法 第13条' },
+      { text: 'すべて国民は、法の下に平等であつて、人種、信条、性別、社会的身分又は門地により、政治的、経済的又は社会的関係において、差別されない', author: '日本国憲法 第14条' },
+      { text: '思想及び良心の自由は、これを侵してはならない', author: '日本国憲法 第19条' },
+      { text: '信教の自由は、何人に対してもこれを保障する', author: '日本国憲法 第20条' },
+      { text: '集会、結社及び言論、出版その他一切の表現の自由は、これを保障する', author: '日本国憲法 第21条' },
+      { text: 'すべて国民は、健康で文化的な最低限度の生活を営む権利を有する', author: '日本国憲法 第25条' },
+      { text: 'すべて国民は、法律の定めるところにより、その能力に応じて、ひとしく教育を受ける権利を有する', author: '日本国憲法 第26条' },
+      { text: 'すべて国民は、勤労の権利を有し、義務を負ふ', author: '日本国憲法 第27条' },
+      { text: '財産権は、これを侵してはならない', author: '日本国憲法 第29条' },
+      { text: '何人も、裁判所において裁判を受ける権利を奪はれない', author: '日本国憲法 第32条' },
+      { text: '何人も、法律の定める手続によらなければ、その生命若しくは自由を奪はれ、又はその他の刑罰を科せられない', author: '日本国憲法 第31条' },
+      { text: '何人も、現行犯として逮捕される場合を除いては、権限を有する司法官憲が発し、且つ理由となつてゐる犯罪を明示する令状によらなければ、逮捕されない', author: '日本国憲法 第33条' },
+      { text: '何人も、理由を直ちに告げられ、且つ、直ちに弁護人に依頼する権利を与へられなければ、抑留又は拘禁されない', author: '日本国憲法 第34条' },
+      { text: '公務員を選定し、及びこれを罷免することは、国民固有の権利である', author: '日本国憲法 第15条' },
+      { text: '婚姻は、両性の合意のみに基いて成立し、夫婦が同等の権利を有することを基本として、相互の協力により、維持されなければならない', author: '日本国憲法 第24条' },
+      { text: '天皇は、日本国の象徴であり日本国民統合の象徴であつて、この地位は、主権の存する日本国民の総意に基く', author: '日本国憲法 第1条' },
+      { text: '日本国民は、正義と秩序を基調とする国際平和を誠実に希求し、国権の発動たる戦争と、武力による威嚇又は武力の行使は、国際紛争を解決する手段としては、永久にこれを放棄する', author: '日本国憲法 第9条' },
+      { text: '国会は、国権の最高機関であつて、国の唯一の立法機関である', author: '日本国憲法 第41条' },
+      { text: 'すべて司法権は、最高裁判所及び法律の定めるところにより設置する下級裁判所に属する', author: '日本国憲法 第76条' },
+      { text: '地方公共団体の組織及び運営に関する事項は、地方自治の本旨に基いて、法律でこれを定める', author: '日本国憲法 第92条' },
+      { text: '私権は、公共の福祉に適合しなければならない', author: '民法 第1条第1項' },
+      { text: '権利の行使及び義務の履行は、信義に従い誠実に行わなければならない', author: '民法 第1条第2項' },
+      { text: '権利の濫用は、これを許さない', author: '民法 第1条第3項' },
+      { text: '私権の享有は、出生に始まる', author: '民法 第3条第1項' },
+      { text: '年齢十八歳をもって、成年とする', author: '民法 第4条' },
+      { text: '法律行為の当事者が意思表示をした時に意思能力を有しなかったときは、その法律行為は、無効とする', author: '民法 第3条の2' },
+      { text: '物権は、この法律その他の法律に定めるもののほか、創設することができない', author: '民法 第175条' },
+      { text: '所有者は、法令の制限内において、自由にその所有物の使用、収益及び処分をする権利を有する', author: '民法 第206条' },
+      { text: '占有者がその占有を妨害されたときは、占有保持の訴えにより、その妨害の停止及び損害の賠償を請求することができる', author: '民法 第198条' },
+      { text: '債権者は、債務者に対し履行を請求することができる', author: '民法 第414条第1項' },
+      { text: '債務者がその債務の本旨に従った履行をしないとき又は債務の履行が不能であるときは、債権者は、これによって生じた損害の賠償を請求することができる', author: '民法 第415条第1項' },
+      { text: '故意又は過失によって他人の権利又は法律上保護される利益を侵害した者は、これによって生じた損害を賠償する責任を負う', author: '民法 第709条' },
+      { text: '契約は、契約の内容を示してその締結を申し入れる意思表示に対して相手方が承諾をしたときに成立する', author: '民法 第522条第1項' },
+      { text: '売買は、当事者の一方がある財産権を相手方に移転することを約し、相手方がこれに対してその代金を支払うことを約することによって、その効力を生ずる', author: '民法 第555条' },
+      { text: '贈与は、当事者の一方がある財産を無償で相手方に与える意思を表示し、相手方が受諾をすることによって、その効力を生ずる', author: '民法 第549条' },
+      { text: '賃貸借は、当事者の一方がある物の使用及び収益を相手方にさせることを約し、相手方がこれに対してその賃料を支払うこと及び引渡しを受けた物を契約が終了したときに返還することを約することによって、その効力を生ずる', author: '民法 第601条' },
+      { text: '委任は、当事者の一方が法律行為をすることを相手方に委託し、相手方がこれを承諾することによって、その効力を生ずる', author: '民法 第643条' },
+      { text: '相続は、死亡によって開始する', author: '民法 第882条' },
+      { text: '相続人は、相続開始の時から、被相続人の財産に属した一切の権利義務を承継する', author: '民法 第896条' },
+      { text: '夫婦は同居し、互いに協力し扶助しなければならない', author: '民法 第752条' },
+      { text: 'この法律は、日本国内において罪を犯したすべての者に適用する', author: '刑法 第1条第1項' },
+      { text: '法律に特別の規定がない限り、罰しない', author: '刑法 第8条' },
+      { text: '罪を犯す意思がない行為は、罰しない', author: '刑法 第38条第1項' },
+      { text: '心神喪失者の行為は、罰しない', author: '刑法 第39条第1項' },
+      { text: '十四歳に満たない者の行為は、罰しない', author: '刑法 第41条' },
+      { text: '犯罪の実行に着手してこれを遂げなかった者は、その刑を減軽することができる', author: '刑法 第43条' },
+      { text: '正当防衛として行った行為は、罰しない', author: '刑法 第36条第1項（要約）' },
+      { text: '緊急避難として行った行為は、これによって生じた害が避けようとした害の程度を超えなかった場合に限り、罰しない', author: '刑法 第37条第1項（要約）' },
+      { text: '人を殺した者は、死刑又は無期若しくは五年以上の懲役に処する', author: '刑法 第199条' },
+      { text: '人の身体を傷害した者は、十五年以下の懲役又は五十万円以下の罰金に処する', author: '刑法 第204条' },
+      { text: '暴行を加えた者が人を傷害するに至らなかったときは、二年以下の懲役若しくは三十万円以下の罰金又は拘留若しくは科料に処する', author: '刑法 第208条' },
+      { text: '他人の財物を窃取した者は、窃盗の罪とし、十年以下の懲役又は五十万円以下の罰金に処する', author: '刑法 第235条' },
+      { text: '暴行又は脅迫を用いて他人の財物を強取した者は、強盗の罪とし、五年以上の有期懲役に処する', author: '刑法 第236条第1項' },
+      { text: '人を欺いて財物を交付させた者は、十年以下の懲役に処する', author: '刑法 第246条第1項' },
+      { text: '人を恐喝して財物を交付させた者は、十年以下の懲役に処する', author: '刑法 第249条第1項' },
+      { text: '他人の財物を横領した者は、五年以下の懲役に処する', author: '刑法 第252条第1項' },
+      { text: '他人の建造物又は艦船を損壊した者は、五年以下の懲役に処する', author: '刑法 第260条' },
+      { text: '放火して、現に人が住居に使用し又は現に人がいる建造物等を焼損した者は、死刑又は無期若しくは五年以上の懲役に処する', author: '刑法 第108条' },
+      { text: '公務員がその職務に関し、賄賂を収受し、又はその要求若しくは約束をしたときは、五年以下の懲役に処する', author: '刑法 第197条第1項' },
+      { text: '公然と事実を摘示し、人の名誉を毀損した者は、その事実の有無にかかわらず、三年以下の懲役若しくは禁錮又は五十万円以下の罰金に処する', author: '刑法 第230条第1項' },
+      { text: '事実を摘示しなくても、公然と人を侮辱した者は、一年以下の懲役若しくは禁錮若しくは三十万円以下の罰金又は拘留若しくは科料に処する', author: '刑法 第231条' },
+      { text: '会社は、法人とする', author: '会社法 第3条' },
+      { text: '株式会社は、その本店の所在地において設立の登記をすることによって成立する', author: '会社法 第49条' },
+      { text: '株主の責任は、その有する株式の引受価額を限度とする', author: '会社法 第104条' },
+      { text: '取締役は、法令及び定款並びに株主総会の決議を遵守し、株式会社のため忠実にその職務を行わなければならない', author: '会社法 第355条' },
+      { text: '労働条件は、労働者と使用者が、対等の立場において決定すべきものである', author: '労働基準法 第2条第1項' },
+      { text: '使用者は、労働者に、休憩時間を除き一週間について四十時間を超えて、労働させてはならない', author: '労働基準法 第32条第1項' },
+      { text: '使用者は、労働者に対して、毎週少くとも一回の休日を与えなければならない', author: '労働基準法 第35条第1項' },
+      { text: '使用者は、その雇入れの日から起算して六箇月間継続勤務し全労働日の八割以上出勤した労働者に対して、十労働日の有給休暇を与えなければならない', author: '労働基準法 第39条第1項' },
+      { text: '使用者は、労働契約の締結に際し、労働者に対して賃金、労働時間その他の労働条件を明示しなければならない', author: '労働基準法 第15条第1項' },
+      { text: '賃金は、通貨で、直接労働者に、その全額を支払わなければならない', author: '労働基準法 第24条第1項' },
+      { text: '使用者は、児童が満十五歳に達した日以後の最初の三月三十一日が終了するまで、これを使用してはならない', author: '労働基準法 第56条第1項' },
+      { text: '何人も、公共の福祉に反しない限り、職業選択の自由を有する', author: '日本国憲法 第22条第1項' },
+      { text: '何人も、自己に不利益な供述を強要されない', author: '日本国憲法 第38条第1項' },
+      { text: 'すべて国民は、ひとしく、その能力に応じた教育を受ける機会を与えられなければならず、人種、信条、性別、社会的身分、経済的地位又は門地によって、教育上差別されない', author: '教育基本法 第4条第1項' },
+      { text: '事業者は、消費者との間で締結する契約に係る条項において、消費者の利益を一方的に害するものを定めてはならない', author: '消費者契約法 第10条（要約）' },
+      { text: '個人情報取扱事業者は、あらかじめ本人の同意を得ないで、個人データを第三者に提供してはならない', author: '個人情報保護法 第27条第1項（要約）' },
+      { text: '行政庁の処分に不服がある者は、審査請求をすることができる', author: '行政不服審査法 第2条（要約）' },
+      { text: '何人も、酒気を帯びて車両等を運転してはならない', author: '道路交通法 第65条第1項' },
+      { text: '自動車の運行によって他人の生命又は身体を害したときは、これによって生じた損害を賠償する責に任ずる', author: '自動車損害賠償保障法 第3条（要約）' },
+      { text: '国民は、納税の義務を負ふ', author: '日本国憲法 第30条' },
+      { text: '何人も、みだりに廃棄物を捨ててはならない', author: '廃棄物処理法 第16条' },
+      { text: '事業者は、労働者の安全と健康を確保するようにしなければならない', author: '労働安全衛生法 第3条第1項（要約）' },
+      { text: '著作者は、その著作物を創作した時から著作権を有する', author: '著作権法 第17条第1項（要約）' },
+      { text: '著作権の存続期間は、著作者の死後七十年を経過するまでの間、存続する', author: '著作権法 第51条第2項（要約）' },
+      { text: '特許を受けることができる発明は、産業上利用することができる発明であること', author: '特許法 第29条第1項（要約）' },
+      { text: '保護者は、子の教育について第一義的責任を有する', author: '教育基本法 第10条第1項（要約）' },
+      // 合衆国憲法
+      { text: '連邦議会は、宗教の設立に関する法律、もしくは宗教の自由な行使を禁止する法律を制定してはならない', author: '合衆国憲法修正第1条' },
+      { text: '連邦議会は、言論または報道の自由を制限する法律を制定してはならない', author: '合衆国憲法修正第1条' },
+      { text: '人民が武器を保有し携帯する権利は、これを侵してはならない', author: '合衆国憲法修正第2条' },
+      { text: '不合理な捜索および押収に対して身体、家屋、書類および所有物の安全を保障される人民の権利は、これを侵してはならない', author: '合衆国憲法修正第4条' },
+      { text: '何人も、同一の犯罪について重ねて生命または身体の危険にさらされることはない', author: '合衆国憲法修正第5条' },
+      { text: '何人も、法の適正な過程によらずに、生命、自由、または財産を奪われることはない', author: '合衆国憲法修正第5条' },
+      { text: '何人も、刑事事件において自己に不利な証人となることを強要されない', author: '合衆国憲法修正第5条' },
+      { text: 'すべての刑事訴追において、被告人は迅速かつ公開の裁判を受ける権利を有する', author: '合衆国憲法修正第6条' },
+      { text: '過大な保釈金を要求し、または過大な罰金を科し、もしくは残虐かつ異常な刑罰を科してはならない', author: '合衆国憲法修正第8条' },
+      { text: '合衆国においても、その管轄に服するいかなる地域においても、奴隷制度および本人の意に反する苦役は存在してはならない', author: '合衆国憲法修正第13条' },
+      { text: 'いかなる州も、法の適正な過程によらずに、何人からも生命、自由、または財産を奪ってはならない', author: '合衆国憲法修正第14条' },
+      { text: 'いかなる州も、その管轄内にある何人に対しても法の平等な保護を否定してはならない', author: '合衆国憲法修正第14条' },
+      { text: '合衆国市民の投票権は、人種、体色、または以前の隷属状態を理由として、合衆国またはいかなる州によっても否定または制限されてはならない', author: '合衆国憲法修正第15条' },
+      { text: '合衆国市民の投票権は、性別を理由として、合衆国またはいかなる州によっても否定または制限されてはならない', author: '合衆国憲法修正第19条' },
+      { text: '十八歳以上の合衆国市民の投票権は、年齢を理由として合衆国またはいかなる州によっても否定または制限されてはならない', author: '合衆国憲法修正第26条' },
+      { text: '連邦議会は、合衆国のすべての立法権を付与される', author: '合衆国憲法第1条第1節' },
+      { text: '行政権は、アメリカ合衆国大統領に付与される', author: '合衆国憲法第2条第1節' },
+      { text: '合衆国の司法権は、一の最高裁判所および連邦議会が随時制定し設置する下級裁判所に付与される', author: '合衆国憲法第3条第1節' },
+      { text: '各州は、他のすべての州の公的行為、記録、および司法手続に対して、十分な信頼と信用を与えなければならない', author: '合衆国憲法第4条第1節' },
+      { text: '本憲法に列挙されていない権利が人民に留保される', author: '合衆国憲法修正第9条' },
+      { text: '憲法により合衆国に委任されず、また州に対して禁止されていない権限は、それぞれの州または人民に留保される', author: '合衆国憲法修正第10条' },
+      { text: '私有財産は、正当な補償なくして公共の用途のために収用されてはならない', author: '合衆国憲法修正第5条' },
+      { text: '人民が平穏に集会し、また苦痛の救済を求めて政府に請願する権利は、これを侵してはならない', author: '合衆国憲法修正第1条' },
+      // プロレスラーの言葉
+      { text: 'プロレスラーにとって一番大事なのは、相手の技を受けきる覚悟だ', author: 'アントニオ猪木' },
+      { text: '壁があったら殴って壊す。道がなければ自分で作る', author: 'アントニオ猪木' },
+      { text: '限界なんてものは他人が決めるものじゃない', author: 'アントニオ猪木' },
+      { text: '苦しいときほど笑え。笑えなくなったら終わりだ', author: 'アントニオ猪木' },
+      { text: '寝てるときに見るのが夢じゃない。起きてるときに見るのが夢なんだ', author: 'アントニオ猪木' },
+      { text: 'プロレスラーはリングの上で語るんだ。言葉じゃない', author: 'ジャイアント馬場' },
+      { text: '身体が大きいだけじゃプロレスはできない。心が大きくなきゃ', author: 'ジャイアント馬場' },
+      { text: 'チャンピオンっていうのはベルトを巻いてる奴のことじゃない。一番努力した奴のことだ', author: 'ジャイアント馬場' },
+      { text: '相手が強ければ強いほど、自分も強くなれる', author: '長州力' },
+      { text: 'プロレスってのは嘘をつかない。リングの上では全部本当だ', author: '長州力' },
+      { text: '戦う前から結果を考える奴に、勝つ資格はない', author: '長州力' },
+      { text: '怪我をして初めて自分の体のありがたさがわかる', author: '橋本真也' },
+      { text: 'リングに上がったら年齢もキャリアも関係ない。そこにあるのは今だけだ', author: '橋本真也' },
+      { text: '技を出すんじゃない。技で語るんだ', author: '武藤敬司' },
+      { text: 'プロレスには台本がないんだよ。あるのは信頼だけだ', author: '武藤敬司' },
+      { text: '相手を輝かせることが自分を輝かせることになる', author: '武藤敬司' },
+      { text: '膝が壊れても、まだ両手がある。両手が壊れても、まだ気持ちがある', author: '武藤敬司' },
+      { text: 'ビンタ一発で人生変わることもある', author: '蝶野正洋' },
+      { text: 'かっこつけてるんじゃない。かっこいいんだ', author: '蝶野正洋' },
+      { text: '闘い方がわからなくなったら、一番最初に覚えた技を思い出せ', author: '蝶野正洋' },
+      { text: 'ガラガラの会場で試合をした日のことを忘れたことはない', author: '棚橋弘至' },
+      { text: '満員の会場は当たり前じゃない。一人一人が来てくれた結果なんだ', author: '棚橋弘至' },
+      { text: 'プロレスのことをバカにされるのが一番悔しかった。だから証明したかった', author: '棚橋弘至' },
+      { text: '笑われても続けたことが、いつか笑わせる側に変わる', author: '棚橋弘至' },
+      { text: '海外で評価されなかった時期があったから、今の自分がある', author: '内藤哲也' },
+      { text: 'ブーイングの中にこそ、本当の声援が隠れている', author: '内藤哲也' },
+      { text: '観客を無視したんじゃない。観客の期待の裏をかいたんだ', author: '内藤哲也' },
+      { text: 'メインイベントに立つために10年かかった。でもその10年に意味がある', author: 'オカダ・カズチカ' },
+      { text: 'チャンピオンでいることより、チャンピオンであり続けることの方が何倍も難しい', author: 'オカダ・カズチカ' },
+      { text: '試合前にどれだけ怖くても、ゴングが鳴った瞬間に全部消える', author: 'オカダ・カズチカ' },
+      { text: '強さとは殴る力じゃない。殴られても立つ力だ', author: '中邑真輔' },
+      { text: '自分のスタイルを貫くことが、一番の差別化になる', author: '中邑真輔' },
+      { text: '言葉が通じなくてもプロレスは通じる。身体が言語なんだ', author: '中邑真輔' },
+      { text: '受け身は逃げじゃない。次に立ち上がるための技術だ', author: '三沢光晴' },
+      { text: '試合が終わった後にもう一度やりたいと思わせるのが本当のプロレスだ', author: '三沢光晴' },
+      { text: '練習でできないことは本番でもできない', author: '三沢光晴' },
+      { text: '痛みは一瞬だが、逃げた記憶は一生残る', author: '小橋建太' },
+      { text: '努力は報われるとは限らないが、努力しない奴に勝つ資格はない', author: '小橋建太' },
+      { text: 'がんになっても復帰できたのは、リングが待っていてくれたからだ', author: '小橋建太' },
+      { text: '引退試合を自分で決められるレスラーは幸せだ', author: '天龍源一郎' },
+      { text: '若い奴に負けるのは悔しいが、若い奴が育つのは嬉しい', author: '天龍源一郎' },
+      { text: '50歳を超えてからが本当の勝負だった', author: '天龍源一郎' },
+      { text: 'プロレスのリングは戦場だ。戦場に友情はない', author: '鈴木みのる' },
+      { text: '年を取ったから弱くなるんじゃない。手を抜くから弱くなるんだ', author: '鈴木みのる' },
+      { text: '恐怖心がない奴はプロレスに向いてない。恐怖を乗り越える奴が向いてる', author: '鈴木みのる' },
+      { text: '怖いと思った瞬間に飛べ。考えたら飛べなくなる', author: '飯伏幸太' },
+      { text: '誰もやらないことをやるから価値がある', author: '飯伏幸太' },
+      { text: 'プロレスに不可能はない。あるのは未到達だけだ', author: 'ケニー・オメガ' },
+      { text: '6つ星の試合がないなら、自分で作ればいい', author: 'ケニー・オメガ' },
+      { text: '日本のプロレスが自分を育ててくれた。だから恩返ししたい', author: 'ケニー・オメガ' },
+      { text: 'デビュー戦で負けた日のことを今でも覚えている', author: 'ウィル・オスプレイ' },
+      { text: 'ヤングライオンの頃に掃除した道場の床が、今の自分の土台だ', author: 'SANADA' },
+      { text: '辛い時期は必ずある。でもその時期が自分を作る', author: 'ダスティ・ローデス（WWE）' },
+      { text: '普通の人間が特別になれる場所、それがプロレスのリングだ', author: 'ダスティ・ローデス（WWE）' },
+      { text: '派手な技じゃなくていい。観客の心を動かす一手があればいい', author: 'ダスティ・ローデス（WWE）' },
+      { text: 'マイクを握ったら、世界中の誰よりも自分を信じろ', author: 'リック・フレアー（WWE）' },
+      { text: 'タイトルは何度でも失う。大事なのはそこから何度取り返すかだ', author: 'リック・フレアー（WWE）' },
+      { text: '60分戦える体力を作れ。そうすれば30分の試合は楽に見える', author: 'リック・フレアー（WWE）' },
+      { text: '信じることをやめた瞬間に、観客も信じなくなる', author: 'ストーンコールド（WWE）' },
+      { text: 'キャラクターを演じるんじゃない。自分自身のボリュームを上げるんだ', author: 'ストーンコールド（WWE）' },
+      { text: 'レスラーの価値は何回チャンピオンになったかじゃない。何回立ち上がったかだ', author: 'ザ・ロック（WWE）' },
+      { text: '成功は借り物だ。毎日返済し続けなければ取り上げられる', author: 'ザ・ロック（WWE）' },
+      { text: 'WWEのリングに立てなかった時期に一番成長した', author: 'ジョン・シナ（WWE）' },
+      { text: 'ファンに嫌われることを恐れるな。無関心にされることを恐れろ', author: 'ジョン・シナ（WWE）' },
+      { text: '失敗しても誰も死なない。だから全力でやれ', author: 'ジョン・シナ（WWE）' },
+      { text: '30年間一度も手を抜いたことがない。それだけが自慢だ', author: 'ジ・アンダーテイカー（WWE）' },
+      { text: 'ギミックの裏にいる人間を尊敬してもらえるのが一番嬉しい', author: 'ジ・アンダーテイカー（WWE）' },
+      { text: '最初のロイヤルランブルで30秒で落とされた。そこから始まったんだ', author: 'ショーン・マイケルズ（WWE）' },
+      { text: '引退する日が来るなら、最高の試合で終わりたい', author: 'ショーン・マイケルズ（WWE）' },
+      { text: 'マネー・イン・ザ・バンクを作ったのは、チャンスは自分で掴むものだと伝えたかったから', author: 'エッジ（WWE）' },
+      { text: '首の怪我で引退宣告された時、人生で初めてプロレスの外の自分を考えた', author: 'エッジ（WWE）' },
+      { text: '会社が決めたストーリーより、リングの中で生まれる物語の方が強い', author: 'CMパンク（WWE）' },
+      { text: '体制に文句を言うなら、体制を変えられるだけの実力をつけろ', author: 'CMパンク（WWE）' },
+      { text: 'プロレスを「フェイク」と呼ぶ奴に一度リングに上がらせてみたい', author: 'ミック・フォーリー（WWE）' },
+      { text: '地獄の檻から落ちた日、痛みより先に「これで伝説になれる」と思った', author: 'ミック・フォーリー（WWE）' },
+      { text: 'レスリングの技術は教えられる。でもカリスマは教えられない', author: 'トリプルH（WWE）' },
+      { text: 'NXTを作ったのは、未来のスーパースターに安全に失敗できる場所を与えたかったからだ', author: 'トリプルH（WWE）' },
+      { text: 'この業界で生き残るには、変化を恐れないことだ', author: 'クリス・ジェリコ（WWE）' },
+      { text: '1000個のキャラクターを試して、ようやく自分に合うものが見つかった', author: 'クリス・ジェリコ（WWE）' },
+      { text: '小さいことが武器になる。大きい奴にはできない動きがある', author: 'レイ・ミステリオ（WWE）' },
+      { text: 'マスクの下にある顔より、マスクの上にある魂が大事だ', author: 'レイ・ミステリオ（WWE）' },
+      { text: 'タッグチームの真髄は、自分が犠牲になってでもパートナーを立てることだ', author: 'エディ・ゲレロ（WWE）' },
+      { text: '試合で泣いたことは何度もある。でもそれを見せるのもプロの仕事だ', author: 'エディ・ゲレロ（WWE）' },
+      { text: '独学でやってきた。だから誰にも真似できないスタイルになった', author: 'ブレイ・ワイアット（WWE）' },
+      { text: 'プロレスの敵は他の格闘技じゃない。プロレスを過小評価する自分自身だ', author: 'ダニエル・ブライアン（WWE）' },
+      { text: 'チャンスが来た時に準備ができていなければ、チャンスはチャンスじゃない', author: 'ローマン・レインズ（WWE）' },
+      { text: 'ブーイングをもらえるのは注目されている証拠だ', author: 'ローマン・レインズ（WWE）' },
+      { text: '今日の負けは明日の勝ちへの布石だ', author: 'セス・ロリンズ（WWE）' },
+    ];
+
+
+    function calculateGrip(sheets) {
+      if (sheets <= 0) return 0;
+      return Math.round(sheets * 2.5 + Math.pow(sheets, 1.15) * 0.8);
+    }
+
+    const humanFallback = { name: '人間', emoji: '🧑', grip: '???', deaths: -1 };
+
+    function findAnimal(grip) {
+      if (grip >= 700) return humanFallback;
+      for (const tier of animalTiers) {
+        if (grip >= tier.min && grip < tier.max) {
+          const a = tier.animals;
+          return a[Math.floor(Math.random() * a.length)];
+        }
+      }
+      const last = animalTiers[animalTiers.length - 1];
+      return last.animals[Math.floor(Math.random() * last.animals.length)];
+    }
+
+
+    function checkGrip() {
+      const input = document.getElementById('sheetsInput');
+      const sheets = parseInt(input.value);
+
+      if (!sheets || sheets < 1) {
+        input.style.borderColor = '#e74c3c';
+        input.focus();
+        setTimeout(() => { input.style.borderColor = '#ccc'; }, 1500);
+        return;
+      }
+
+      const grip = calculateGrip(Math.min(sheets, 999));
+      const animal = findAnimal(grip);
+
+      // Grip
+      const gripEl = document.getElementById('gripValue');
+      animateNumber(gripEl, 0, grip, 800);
+
+      const barPct = Math.min((grip / 120) * 100, 100);
+      setTimeout(() => {
+        document.getElementById('gripBar').style.width = barPct + '%';
+      }, 200);
+
+      // Damage variation
+      const youEl = document.querySelector('.you');
+      const effects = [
+        'split-1','split-2','split-3','split-4','split-5','split-6','split-7','split-8',
+        'torn-1','torn-2','torn-3','torn-4','torn-5','torn-6',
+        'punch-1','punch-2','punch-3','punch-4','punch-5','punch-6',
+      ];
+      youEl.className = 'you ' + effects[Math.floor(Math.random() * effects.length)];
+
+      // Animal
+      document.getElementById('animalEmoji').textContent = animal.emoji;
+      document.getElementById('animalName').textContent = animal.name;
+      document.getElementById('animalGrip').textContent = `握力 ${animal.grip}kg`;
+      const quote = quotes[Math.floor(Math.random() * quotes.length)];
+      document.getElementById('animalTrivia').textContent = `${quote.text} ── ${quote.author}`;
+      document.getElementById('animalDeaths').textContent =
+        animal.deaths < 0 ? '' :
+        animal.deaths === 0 ? '年間の犠牲者数: 0人' : `年間の犠牲者数: 約${animal.deaths.toLocaleString()}人`;
+
+      // Show
+      const results = document.getElementById('results');
+      results.classList.remove('show');
+      void results.offsetWidth;
+      results.classList.add('show');
+
+      setTimeout(() => {
+        results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+
+      window._lastResult = { sheets, grip, animal };
+    }
+
+    function animateNumber(el, from, to, duration) {
+      const start = performance.now();
+      const update = (now) => {
+        const elapsed = now - start;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        el.textContent = Math.round(from + (to - from) * eased);
+        if (progress < 1) requestAnimationFrame(update);
+      };
+      requestAnimationFrame(update);
+    }
+
+    function retry() {
+      document.getElementById('results').classList.remove('show');
+      document.getElementById('gripBar').style.width = '0%';
+      document.getElementById('sheetsInput').value = '';
+      document.getElementById('sheetsInput').focus();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function shareResult() {
+      if (!window._lastResult) return;
+      const { sheets, grip, animal } = window._lastResult;
+      const text = [
+        '紙ちぎり握力チェッカーの結果',
+        '',
+        `ちぎった紙: ${sheets}枚`,
+        `推定握力: ${grip}kg`,
+        `ぎりぎり負ける動物: ${animal.emoji} ${animal.name}（${animal.grip}kg）`,
+        '',
+        '#紙ちぎり握力チェッカー',
+      ].join('\n');
+
+      navigator.clipboard.writeText(text).then(() => {
+        showToast();
+      }).catch(() => {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        showToast();
+      });
+    }
+
+    function showToast() {
+      const t = document.getElementById('copiedToast');
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2000);
+    }
+
+    document.getElementById('sheetsInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') checkGrip();
+    });
+  </script>
+</body>
+</html>
