@@ -586,25 +586,29 @@
   <script>
     // 紙吹雪背景の生成
     (() => {
-      const emojis = ['🐞','🐌','🐸','🦂','🐹','🐰','🐔','🐧','🐱','🦊','🦦','🐨','🐑','🐗','🦅','🐙','🦘','🐍','🐼','🐆','🦁','🐴','🐅','🐻','🦍','🐘','🦀','🦈','🐊','🦉','🐋','🦛'];
+      const people = ['🧑','👨','👩','🧒','👦','👧','👶','🧓','👴','👵','👨‍🦰','👩‍🦰','👨‍🦱','👩‍🦱','👨‍🦳','👩‍🦳','👱‍♂️','👱‍♀️','🧔','👲','🤴','👸','👷','💂','🧑‍🚀','🧑‍🎤','🧑‍💻','🧑‍🔬','🧑‍🏫','🧑‍🌾','🧑‍⚕️','🧑‍🎨','🤸','🏃','🚶','🧎','🏋️','🧗','🏄','🚴'];
+      const tearShapes = [
+        'polygon(0% 0%, 58% 0%, 52% 48%, 0% 42%)',
+        'polygon(42% 0%, 100% 0%, 100% 46%, 48% 52%)',
+        'polygon(0% 52%, 52% 48%, 56% 100%, 0% 100%)',
+        'polygon(48% 52%, 100% 46%, 100% 100%, 44% 100%)',
+        'polygon(5% 0%, 52% 0%, 48% 100%, 0% 100%)',
+        'polygon(50% 0%, 100% 0%, 100% 100%, 46% 100%)',
+        'polygon(0% 0%, 100% 0%, 96% 52%, 4% 56%)',
+        'polygon(4% 48%, 96% 44%, 100% 100%, 0% 100%)',
+      ];
       const bg = document.getElementById('confettiBg');
-      const count = 30;
+      const count = 35;
       for (let i = 0; i < count; i++) {
         const el = document.createElement('span');
         el.className = 'confetti-piece';
-        el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        el.textContent = people[Math.floor(Math.random() * people.length)];
         el.style.left = (Math.random() * 100) + '%';
-        el.style.fontSize = (0.8 + Math.random() * 1.2) + 'rem';
-        el.style.opacity = 0.06 + Math.random() * 0.08;
-        el.style.animationDuration = (12 + Math.random() * 20) + 's';
-        el.style.animationDelay = -(Math.random() * 30) + 's';
-        const shapes = [
-          'polygon(8% 0%, 95% 5%, 88% 100%, 3% 92%)',
-          'polygon(5% 3%, 92% 0%, 100% 88%, 8% 95%)',
-          'polygon(0% 8%, 88% 0%, 95% 92%, 5% 100%)',
-          'polygon(10% 0%, 100% 10%, 90% 100%, 0% 90%)',
-        ];
-        el.style.clipPath = shapes[Math.floor(Math.random() * shapes.length)];
+        el.style.fontSize = (1.0 + Math.random() * 1.4) + 'rem';
+        el.style.opacity = 0.07 + Math.random() * 0.09;
+        el.style.animationDuration = (14 + Math.random() * 22) + 's';
+        el.style.animationDelay = -(Math.random() * 35) + 's';
+        el.style.clipPath = tearShapes[Math.floor(Math.random() * tearShapes.length)];
         bg.appendChild(el);
       }
     })();
