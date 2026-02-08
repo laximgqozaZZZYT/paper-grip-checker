@@ -602,15 +602,6 @@
     body.site-warped, .container.site-warped {
       filter: url(#siteWarpFilter);
     }
-    body.site-pixelate, .container.site-pixelate {
-      animation: sitepixelate 2s steps(8) forwards;
-    }
-    @keyframes sitepixelate {
-      0%   { filter: blur(0px) contrast(1); }
-      30%  { filter: blur(2px) contrast(1.5); }
-      60%  { filter: blur(4px) contrast(2); }
-      100% { filter: blur(8px) contrast(3) brightness(0.5); }
-    }
     /* 文字化け */
     body.site-garble .container { }
     /* 紙吹雪接近 */
@@ -825,7 +816,6 @@
         { name: '60代', emoji: '🧓', grip: 40, deaths: 0 },
         { name: '高校生（16〜18歳）', emoji: '💪', grip: 40, deaths: 0 },
         { name: 'エチオピアオオカミ', emoji: '🐺', grip: 40, deaths: 0 },
-        { name: '那須川天心（格闘家）', emoji: '🥊', grip: 42, deaths: 0 },
         { name: 'パタゴニアミナミキバナガオオフサヒゲヤマネコモドキ', emoji: '🐱', grip: 42, deaths: 0 },
         { name: 'キングチーター', emoji: '🐆', grip: 42, deaths: 0 },
         { name: 'エゾシカ', emoji: '🦌', grip: 42, deaths: 5 },
@@ -1481,7 +1471,7 @@
     ];
 
     const siteGlitchClasses = [
-      'site-warped', 'site-pixelate',
+      'site-warped',
       'site-garble', 'site-confetti-rush',
     ];
 
