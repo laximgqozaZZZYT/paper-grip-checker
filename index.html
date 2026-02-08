@@ -31,6 +31,7 @@
       pointer-events: none;
       z-index: 0;
       overflow: hidden;
+      perspective: 600px;
     }
 
     .confetti-piece {
@@ -601,28 +602,6 @@
     body.site-warped, .container.site-warped {
       filter: url(#siteWarpFilter);
     }
-    body.site-hueloop, .container.site-hueloop {
-      animation: hueloop 0.4s linear infinite;
-    }
-    @keyframes hueloop {
-      0%   { filter: hue-rotate(0deg) saturate(3); }
-      100% { filter: hue-rotate(360deg) saturate(3); }
-    }
-    body.site-shake, .container.site-shake {
-      animation: siteshake 0.08s linear infinite;
-    }
-    @keyframes siteshake {
-      0%   { transform: translate(0, 0) rotate(0deg); }
-      25%  { transform: translate(-6px, 4px) rotate(-1deg); }
-      50%  { transform: translate(5px, -3px) rotate(0.8deg); }
-      75%  { transform: translate(-3px, -5px) rotate(-0.5deg); }
-      100% { transform: translate(4px, 2px) rotate(0.3deg); }
-    }
-    body.site-flip, .container.site-flip {
-      transform: scale(-1, -1);
-      filter: invert(1);
-      transition: transform 1.5s cubic-bezier(0.2, 2, 0.5, 1), filter 1.5s ease;
-    }
     body.site-melt, .container.site-melt {
       animation: sitemelt 2.5s ease forwards;
     }
@@ -638,6 +617,18 @@
       30%  { filter: blur(2px) contrast(1.5); }
       60%  { filter: blur(4px) contrast(2); }
       100% { filter: blur(8px) contrast(3) brightness(0.5); }
+    }
+    /* 文字化け */
+    body.site-garble .container { }
+    /* 紙吹雪接近 */
+    .confetti-bg.site-confetti-rush .confetti-piece {
+      animation: confetti-rush 1.8s ease-in forwards !important;
+      opacity: 1 !important;
+    }
+    @keyframes confetti-rush {
+      0%   { transform: scale(1) translateZ(0); opacity: 0.18; }
+      60%  { transform: scale(8) translateZ(200px); opacity: 0.7; }
+      100% { transform: scale(30) translateZ(500px); opacity: 1; filter: blur(2px); }
     }
 
   </style>
@@ -662,7 +653,7 @@
 
   <div class="container">
     <header class="header">
-      <h1>紙ちぎり握力チェッカー&#8220;<ruby>鑷<rp>(</rp><rt>鑷</rt><rp>)</rp></ruby>&#8221;</h1>
+      <h1>紙ちぎり握力チェッカー&#8220;鑷&#8221;</h1>
       <div class="sub">紙をちぎった枚数から握力を推定します</div>
     </header>
 
@@ -1474,9 +1465,64 @@
     ];
 
     const siteGlitchClasses = [
-      'site-warped', 'site-hueloop', 'site-shake', 'site-flip',
-      'site-melt', 'site-pixelate',
+      'site-warped', 'site-melt', 'site-pixelate',
+      'site-garble', 'site-confetti-rush',
     ];
+
+    // 文字化け用: 各テキストノードの元テキストを保存
+    const garbleChars = '&#@$%!?※△□▽◇★♪♭♯〒〆彁丏丕丱乂亅亊亶仄仆仂仗仞仭仟伀伃伋伎伜伡伣佁佇佉佖佝佞佤佧佪佫佮侊侔侗侘侜侞侲侻侽俅俉俍俑俔俜俠俰俲俳俿倅倆倊倎倐倓倕倗倘倛';
+
+    let garbleInterval = null;
+    let garbleOriginals = [];
+
+    function startGarble() {
+      const container = document.querySelector('.container');
+      const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
+      garbleOriginals = [];
+      const nodes = [];
+      while (walker.nextNode()) {
+        const n = walker.currentNode;
+        if (n.textContent.trim()) {
+          garbleOriginals.push({ node: n, text: n.textContent });
+          nodes.push(n);
+        }
+      }
+      garbleInterval = setInterval(() => {
+        for (const { node, text } of garbleOriginals) {
+          let garbled = '';
+          for (let i = 0; i < text.length; i++) {
+            if (text[i] === ' ' || text[i] === '\n') { garbled += text[i]; continue; }
+            garbled += Math.random() < 0.4
+              ? garbleChars[Math.floor(Math.random() * garbleChars.length)]
+              : text[i];
+          }
+          node.textContent = garbled;
+        }
+      }, 100);
+    }
+
+    function stopGarble() {
+      if (garbleInterval) { clearInterval(garbleInterval); garbleInterval = null; }
+      for (const { node, text } of garbleOriginals) node.textContent = text;
+      garbleOriginals = [];
+    }
+
+    function startConfettiRush() {
+      const bg = document.getElementById('confettiBg');
+      bg.classList.add('site-confetti-rush');
+      const pieces = bg.querySelectorAll('.confetti-piece');
+      pieces.forEach(p => {
+        p.style.animationDelay = (Math.random() * 0.8) + 's';
+      });
+    }
+
+    function stopConfettiRush() {
+      const bg = document.getElementById('confettiBg');
+      bg.classList.remove('site-confetti-rush');
+      bg.querySelectorAll('.confetti-piece').forEach(p => {
+        p.style.animationDelay = -(Math.random() * 35) + 's';
+      });
+    }
 
     function clearSiteGlitch() {
       const container = document.querySelector('.container');
@@ -1485,6 +1531,8 @@
         container.classList.remove(c);
       });
       document.getElementById('siteWarpDisp').setAttribute('scale', '0');
+      stopGarble();
+      stopConfettiRush();
     }
 
     function animateSiteWarp(target) {
@@ -1501,9 +1549,13 @@
       requestAnimationFrame(tick);
     }
 
-    function applyGlitchClass(cls, target) {
+    function applyGlitchEffect(cls, target) {
       if (cls === 'site-warped') {
         animateSiteWarp(target);
+      } else if (cls === 'site-garble') {
+        startGarble();
+      } else if (cls === 'site-confetti-rush') {
+        startConfettiRush();
       } else {
         requestAnimationFrame(() => target.classList.add(cls));
       }
@@ -1516,15 +1568,15 @@
       // primary → body
       const pi = Math.floor(Math.random() * pool.length);
       const primary = pool.splice(pi, 1)[0];
-      applyGlitchClass(primary, document.body);
+      applyGlitchEffect(primary, document.body);
 
-      // ぐにゃり以外は1〜2個の別エフェクトを.containerに重ね掛け
+      // ぐにゃり以外は1〜2個の別エフェクトを重ね掛け
       if (primary !== 'site-warped') {
         const numExtra = 1 + Math.floor(Math.random() * 2);
         for (let i = 0; i < numExtra && pool.length > 0; i++) {
           const ei = Math.floor(Math.random() * pool.length);
           const extra = pool.splice(ei, 1)[0];
-          applyGlitchClass(extra, container);
+          applyGlitchEffect(extra, container);
         }
       }
     }
