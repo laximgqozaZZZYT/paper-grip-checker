@@ -136,18 +136,32 @@
     const nextBtn = document.getElementById('nextBtn');
     const copyBtn = document.getElementById('copyBtn');
 
-    function showRandom() {
+    function showRandom(excludeIndex) {
       if (quotes.length === 0) {
         textEl.textContent = 'フォーチュンが読み込めませんでした。';
         authorEl.textContent = '';
         return;
       }
-      const q = quotes[Math.floor(Math.random() * quotes.length)];
+      var index;
+      if (quotes.length === 1) {
+        index = 0;
+      } else {
+        do {
+          index = Math.floor(Math.random() * quotes.length);
+        } while (index === excludeIndex);
+      }
+      var q = quotes[index];
       textEl.textContent = q.text || '';
       authorEl.textContent = q.author ? '── ' + q.author : '';
+      textEl.dataset.currentIndex = String(index);
     }
 
-    nextBtn.addEventListener('click', showRandom);
+    function showNext() {
+      var current = textEl.dataset.currentIndex != null ? parseInt(textEl.dataset.currentIndex, 10) : -1;
+      showRandom(current);
+    }
+
+    nextBtn.addEventListener('click', showNext);
     copyBtn.addEventListener('click', function () {
       const t = textEl.textContent;
       const a = authorEl.textContent.replace(/^──\s*/, '');
@@ -158,7 +172,7 @@
       }, function () {});
     });
 
-    showRandom();
+    showRandom(-1);
   </script>
 </body>
 </html>
