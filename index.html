@@ -462,6 +462,21 @@
       letter-spacing: 0.03em;
     }
 
+    .fortune-more-wrap {
+      margin-top: 1rem;
+      text-align: center;
+    }
+    .fortune-more {
+      font-size: 0.85rem;
+      color: #8b6d3c;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(139,109,60,0.35);
+    }
+    .fortune-more:hover {
+      color: #6b4e2a;
+      border-bottom-color: #6b4e2a;
+    }
+
     /* Actions */
     .actions {
       display: flex;
@@ -644,7 +659,7 @@
   <div class="container">
     <header class="header">
       <h1>紙ちぎり握力チェッカー&#8220;鑷&#8221;</h1>
-      <div class="sub">紙をちぎった枚数から握力を推定します</div>
+      <div class="sub">重ねてちぎった紙の枚数から握力を推定します</div>
     </header>
 
     <div class="input-area">
@@ -685,6 +700,7 @@
         <div class="animal-grip-tag" id="animalGrip">握力 5kg</div>
         <div class="animal-trivia" id="animalTrivia"></div>
         <div class="animal-deaths" id="animalDeaths"></div>
+        <p class="fortune-more-wrap"><a href="fortune.html" class="fortune-more">もっと見る</a></p>
       </div>
 
       <div class="actions">
@@ -820,7 +836,7 @@
       document.getElementById('animalName').textContent = animal.name;
       document.getElementById('animalGrip').textContent = `握力 ${animal.grip}kg`;
       const quote = quotes[Math.floor(Math.random() * quotes.length)];
-      document.getElementById('animalTrivia').textContent = `${quote.text} ── ${quote.author}`;
+      document.getElementById('animalTrivia').textContent = quote.author ? `${quote.text} ── ${quote.author}` : quote.text;
       document.getElementById('animalDeaths').textContent =
         animal.deaths < 0 ? '' :
         animal.deaths === 0 ? '年間の犠牲者数: 0人' : `年間の犠牲者数: 約${animal.deaths.toLocaleString()}人`;
@@ -905,7 +921,7 @@
       setTimeout(() => t.classList.remove('show'), 2000);
     }
 
-    const destructionLaws = window.__FORTUNE_DATA__.destructionLaws;
+    const blackoutLaws = (window.__FORTUNE_DATA__.quotes || []).filter(q => q.category === '驚きの実在法令');
 
     const siteGlitchClasses = [
       'site-warped',
@@ -1032,11 +1048,12 @@
           overlay.classList.add('fade-in');
         });
       });
-      // 暗転完了後に損壊条文を表示
+      // 暗転完了後に驚きの実在法令を表示
       setTimeout(() => {
-        const law = destructionLaws[Math.floor(Math.random() * destructionLaws.length)];
+        const laws = blackoutLaws.length ? blackoutLaws : (window.__FORTUNE_DATA__.quotes || []).slice(0, 1);
+        const law = laws[Math.floor(Math.random() * laws.length)];
         const fortuneEl = document.getElementById('blackoutFortune');
-        fortuneEl.innerHTML = `${law.text}<br><br>──${law.source}`;
+        fortuneEl.innerHTML = law ? `${law.text}<br><br>──${law.author}` : '';
         fortuneEl.classList.add('show');
       }, 1800);
     }

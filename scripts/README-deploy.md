@@ -2,6 +2,19 @@
 
 平文の `fortune-data.plain.json` と `animal-data.plain.json` は本番に含めず、難読化した JS だけを配布する手順です。
 
+## 本番に含めないファイル（デプロイ対象外）
+
+本番環境にアップロードするのは **dist/ 内の4ファイルだけ**です。以下は **一切デプロイされません**。
+
+| 対象 | 理由 |
+|------|------|
+| `fortune-data.plain.json` | 平文のため本番に載せない |
+| `animal-data.plain.json` | 同上 |
+| `scripts/` 一式 | ビルド・編集用。dist にコピーされない |
+| `.gitignore` 等 | 配布物に不要 |
+
+**dist/ にコピーされるのは** `index.html`・`fortune.html`・`fortune-data.js`・`animal-data.js` の4つ（build.js の `DEPLOY_FILES` で固定）。
+
 ## 1. ビルドの実行
 
 ```bash
@@ -11,8 +24,9 @@ node scripts/build.js
 このスクリプトは次のことをします。
 
 - 平文 JSON から **fortune-data.js** と **animal-data.js** を再生成（難読化）
-- **dist/** に次の3ファイルだけをコピーする  
+- **dist/** に次の4ファイルだけをコピーする  
   - `index.html`  
+  - `fortune.html`  
   - `fortune-data.js`  
   - `animal-data.js`  
 
@@ -35,4 +49,4 @@ node scripts/build.js
 ## 3. 注意
 
 - `dist/` は `.gitignore` に入っているため、通常はリポジトリにはコミットしません。
-- 本番に上げるのは **dist 内の3ファイルだけ**にすると、平文 JSON を本番環境に上げずに運用できます。
+- 本番に上げるのは **dist 内の4ファイルだけ**にすると、平文 JSON を本番環境に上げずに運用できます。

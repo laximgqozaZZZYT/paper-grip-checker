@@ -17,7 +17,7 @@ const { execSync } = require('child_process');
 const ROOT = path.resolve(__dirname, '..');
 const DIST = path.join(ROOT, 'dist');
 
-const DEPLOY_FILES = ['index.html', 'fortune-data.js', 'animal-data.js'];
+const DEPLOY_FILES = ['index.html', 'fortune.html', 'fortune-data.js', 'animal-data.js'];
 
 function main() {
   console.log('Building for production (plain JSON excluded)...\n');

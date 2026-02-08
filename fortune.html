@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>フォーチュンクッキー｜紙ちぎり握力チェッカー"鑷"</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Noto+Serif+JP:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Noto Serif JP', 'Hiragino Mincho ProN', serif;
+      background: #f8f5ef;
+      color: #3a3028;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.2rem;
+    }
+    .container { max-width: 520px; width: 100%; }
+    .header {
+      text-align: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid rgba(139,109,60,0.15);
+    }
+    .header h1 {
+      font-family: 'Cormorant Garamond', 'Noto Serif JP', serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: #6b4e2a;
+    }
+    .header .sub { font-size: 0.78rem; color: #9e8e78; margin-top: 0.4rem; }
+    .fortune-box {
+      background: #fff;
+      border: 1px solid rgba(139,109,60,0.12);
+      border-radius: 16px;
+      padding: 2rem 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 16px rgba(139,109,60,0.06);
+      border-left: 4px solid rgba(139,109,60,0.35);
+    }
+    .fortune-text { font-size: 1rem; line-height: 1.75; color: #3a3028; margin-bottom: 1rem; }
+    .fortune-author { font-size: 0.8rem; color: #8b6d3c; text-align: right; font-style: italic; }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      justify-content: center;
+      margin-bottom: 1.25rem;
+    }
+    .btn {
+      display: inline-block;
+      padding: 0.6rem 1.4rem;
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #fff;
+      background: #8b6d3c;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .btn:hover { background: #6b4e2a; }
+    .btn-secondary { background: transparent; color: #8b6d3c; border: 1px solid rgba(139,109,60,0.4); }
+    .btn-secondary:hover { background: rgba(139,109,60,0.08); }
+    .back-link { font-size: 0.85rem; color: #8b6d3c; text-decoration: none; border-bottom: 1px solid rgba(139,109,60,0.35); }
+    .back-link:hover { color: #6b4e2a; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1>フォーチュンクッキー</h1>
+      <p class="sub">紙ちぎり握力チェッカー"鑷"</p>
+    </header>
+    <div class="actions">
+      <button type="button" class="btn" id="nextBtn">次のフォーチュン</button>
+      <button type="button" class="btn btn-secondary" id="copyBtn">コピー</button>
+    </div>
+    <div class="fortune-box">
+      <p class="fortune-text" id="fortuneText">読み込み中…</p>
+      <p class="fortune-author" id="fortuneAuthor"></p>
+    </div>
+    <p><a href="index.html" class="back-link">← 握力チェッカーに戻る</a></p>
+  </div>
+  <script src="fortune-data.js"></script>
+  <script>
+    const quotes = (window.__FORTUNE_DATA__ && window.__FORTUNE_DATA__.quotes) || [];
+    const textEl = document.getElementById('fortuneText');
+    const authorEl = document.getElementById('fortuneAuthor');
+    const nextBtn = document.getElementById('nextBtn');
+    const copyBtn = document.getElementById('copyBtn');
+
+    function showRandom() {
+      if (quotes.length === 0) {
+        textEl.textContent = 'フォーチュンが読み込めませんでした。';
+        authorEl.textContent = '';
+        return;
+      }
+      const q = quotes[Math.floor(Math.random() * quotes.length)];
+      textEl.textContent = q.text || '';
+      authorEl.textContent = q.author ? '── ' + q.author : '';
+    }
+
+    nextBtn.addEventListener('click', showRandom);
+    copyBtn.addEventListener('click', function () {
+      const t = textEl.textContent;
+      const a = authorEl.textContent.replace(/^──\s*/, '');
+      const line = a ? t + ' ── ' + a : t;
+      navigator.clipboard.writeText(line).then(function () {
+        copyBtn.textContent = 'コピーした';
+        setTimeout(function () { copyBtn.textContent = 'コピー'; }, 2000);
+      }, function () {});
+    });
+
+    showRandom();
+  </script>
+</body>
+</html>
