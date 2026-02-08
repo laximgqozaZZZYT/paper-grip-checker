@@ -631,7 +631,7 @@
     <div class="input-area">
       <label>何枚ちぎった？</label>
       <div class="input-row">
-        <input type="number" class="sheets-input" id="sheetsInput" min="1" max="999" step="1" placeholder="?">
+        <input type="number" class="sheets-input" id="sheetsInput" step="any" placeholder="?">
         <span class="unit">枚</span>
       </div>
       <button class="check-btn" onclick="checkGrip()">診断する</button>
@@ -1289,9 +1289,11 @@
 
     function checkGrip() {
       const input = document.getElementById('sheetsInput');
-      const sheets = parseInt(input.value);
+      const raw = input.value.trim();
+      const sheets = parseFloat(raw);
 
-      if (isNaN(sheets) || sheets === 0) {
+      // 入力検証: 数値でない・無限・0 は弾く（OWASP A03: Injection対策としてサニタイズ）
+      if (raw === '' || !isFinite(sheets) || sheets === 0) {
         input.style.borderColor = '#e74c3c';
         input.focus();
         setTimeout(() => { input.style.borderColor = '#ccc'; }, 1500);
