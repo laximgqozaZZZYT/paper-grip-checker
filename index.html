@@ -597,18 +597,18 @@
       opacity: 1;
     }
 
-    /* 不正値エフェクト: サイト全体に適用 */
-    body.site-warped {
+    /* 不正値エフェクト: body層 + .container層に重ね掛け */
+    body.site-warped, .container.site-warped {
       filter: url(#siteWarpFilter);
     }
-    body.site-hueloop {
+    body.site-hueloop, .container.site-hueloop {
       animation: hueloop 0.4s linear infinite;
     }
     @keyframes hueloop {
       0%   { filter: hue-rotate(0deg) saturate(3); }
       100% { filter: hue-rotate(360deg) saturate(3); }
     }
-    body.site-shake {
+    body.site-shake, .container.site-shake {
       animation: siteshake 0.08s linear infinite;
     }
     @keyframes siteshake {
@@ -618,41 +618,26 @@
       75%  { transform: translate(-3px, -5px) rotate(-0.5deg); }
       100% { transform: translate(4px, 2px) rotate(0.3deg); }
     }
-    body.site-flip {
+    body.site-flip, .container.site-flip {
       transform: scale(-1, -1);
       filter: invert(1);
       transition: transform 1.5s cubic-bezier(0.2, 2, 0.5, 1), filter 1.5s ease;
     }
-    body.site-spin {
-      animation: sitespin 2s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
-    }
-    @keyframes sitespin {
-      0%   { transform: rotate(0deg) scale(1); }
-      50%  { transform: rotate(540deg) scale(0.3); }
-      100% { transform: rotate(1080deg) scale(0.05); opacity: 0; }
-    }
-    body.site-melt {
+    body.site-melt, .container.site-melt {
       animation: sitemelt 2.5s ease forwards;
     }
     @keyframes sitemelt {
       0%   { filter: blur(0px); opacity: 1; transform: scaleY(1); }
       100% { filter: blur(15px); opacity: 0.2; transform: scaleY(2.5) translateY(30vh); }
     }
-    body.site-pixelate {
+    body.site-pixelate, .container.site-pixelate {
       animation: sitepixelate 2s steps(8) forwards;
     }
     @keyframes sitepixelate {
-      0%   { filter: blur(0px) contrast(1); image-rendering: auto; }
+      0%   { filter: blur(0px) contrast(1); }
       30%  { filter: blur(2px) contrast(1.5); }
       60%  { filter: blur(4px) contrast(2); }
       100% { filter: blur(8px) contrast(3) brightness(0.5); }
-    }
-    body.site-flash {
-      animation: siteflash 0.15s steps(1) infinite;
-    }
-    @keyframes siteflash {
-      0%   { filter: invert(0) brightness(1); }
-      50%  { filter: invert(1) brightness(2); }
     }
 
   </style>
@@ -1490,32 +1475,57 @@
 
     const siteGlitchClasses = [
       'site-warped', 'site-hueloop', 'site-shake', 'site-flip',
-      'site-spin', 'site-melt', 'site-pixelate', 'site-flash',
+      'site-melt', 'site-pixelate',
     ];
 
     function clearSiteGlitch() {
-      siteGlitchClasses.forEach(c => document.body.classList.remove(c));
+      const container = document.querySelector('.container');
+      siteGlitchClasses.forEach(c => {
+        document.body.classList.remove(c);
+        container.classList.remove(c);
+      });
       document.getElementById('siteWarpDisp').setAttribute('scale', '0');
+    }
+
+    function animateSiteWarp(target) {
+      const disp = document.getElementById('siteWarpDisp');
+      disp.setAttribute('scale', '0');
+      target.classList.add('site-warped');
+      const duration = 1500, maxScale = 60;
+      const start = performance.now();
+      function tick(now) {
+        const t = Math.min((now - start) / duration, 1);
+        disp.setAttribute('scale', String(Math.round(maxScale * (t * (2 - t)))));
+        if (t < 1) requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    }
+
+    function applyGlitchClass(cls, target) {
+      if (cls === 'site-warped') {
+        animateSiteWarp(target);
+      } else {
+        requestAnimationFrame(() => target.classList.add(cls));
+      }
     }
 
     function triggerSiteGlitch() {
       clearSiteGlitch();
-      const cls = siteGlitchClasses[Math.floor(Math.random() * siteGlitchClasses.length)];
-      if (cls === 'site-warped') {
-        const disp = document.getElementById('siteWarpDisp');
-        disp.setAttribute('scale', '0');
-        document.body.classList.add('site-warped');
-        const duration = 1500, maxScale = 60;
-        const start = performance.now();
-        function tick(now) {
-          const t = Math.min((now - start) / duration, 1);
-          disp.setAttribute('scale', String(Math.round(maxScale * (t * (2 - t)))));
-          if (t < 1) requestAnimationFrame(tick);
+      const container = document.querySelector('.container');
+      const pool = siteGlitchClasses.slice();
+      // primary → body
+      const pi = Math.floor(Math.random() * pool.length);
+      const primary = pool.splice(pi, 1)[0];
+      applyGlitchClass(primary, document.body);
+
+      // ぐにゃり以外は1〜2個の別エフェクトを.containerに重ね掛け
+      if (primary !== 'site-warped') {
+        const numExtra = 1 + Math.floor(Math.random() * 2);
+        for (let i = 0; i < numExtra && pool.length > 0; i++) {
+          const ei = Math.floor(Math.random() * pool.length);
+          const extra = pool.splice(ei, 1)[0];
+          applyGlitchClass(extra, container);
         }
-        requestAnimationFrame(tick);
-      } else {
-        // 一瞬待ってからクラス付与（re-trigger用）
-        requestAnimationFrame(() => document.body.classList.add(cls));
       }
     }
 
