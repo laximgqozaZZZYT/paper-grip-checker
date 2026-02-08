@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>紙ちぎり握力チェッカー"鑷"</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Noto+Serif+JP:wght@400;700;900&display=swap" rel="stylesheet">
+  <!-- TODO: ca-pub-XXXXXXXXXXXXXXXX を自分のパブリッシャーIDに置き換える -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Noto Serif JP', 'Hiragino Mincho ProN', serif;
+      background: #f8f5ef;
+      color: #3a3028;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* 紙吹雪背景 */
+    .confetti-bg {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+      perspective: 600px;
+    }
+
+    .confetti-piece {
+      position: absolute;
+      font-size: 1.4rem;
+      opacity: 0.18;
+      clip-path: polygon(8% 0%, 95% 5%, 88% 100%, 3% 92%);
+      animation: confetti-fall linear infinite;
+      will-change: transform;
+    }
+
+    @keyframes confetti-fall {
+      0% { transform: translateY(-5vh) rotate(0deg); }
+      100% { transform: translateY(110vh) rotate(360deg); }
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 3rem 1.2rem 2rem;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid rgba(139,109,60,0.15);
+    }
+
+    .header h1 {
+      font-family: 'Cormorant Garamond', 'Noto Serif JP', serif;
+      font-size: 1.7rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: #6b4e2a;
+      margin-bottom: 0.5rem;
+    }
+
+    .header .sub {
+      font-size: 0.8rem;
+      color: #9e8e78;
+      letter-spacing: 0.08em;
+      font-weight: 400;
+    }
+
+    /* Input */
+    .input-area {
+      background: #fff;
+      border: 1px solid rgba(139,109,60,0.12);
+      border-radius: 16px;
+      padding: 2rem 1.5rem;
+      text-align: center;
+      margin-bottom: 1.8rem;
+      box-shadow: 0 2px 16px rgba(139,109,60,0.06);
+    }
+
+    .input-area label {
+      display: block;
+      font-family: 'Cormorant Garamond', 'Noto Serif JP', serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 1.2rem;
+      color: #6b4e2a;
+      letter-spacing: 0.1em;
+    }
+
+    .input-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .sheets-input {
+      width: 120px;
+      height: 56px;
+      font-size: 2rem;
+      font-weight: 900;
+      text-align: center;
+      border: 1px solid #ddd2c2;
+      border-radius: 12px;
+      outline: none;
+      font-family: 'Cormorant Garamond', 'Noto Serif JP', serif;
+      background: #faf7f2;
+      color: #3a3028;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .sheets-input:focus {
+      border-color: #a08050;
+      box-shadow: 0 0 0 3px rgba(139,109,60,0.1);
+    }
+
+    .unit {
+      font-size: 1rem;
+      font-weight: 400;
+      color: #9e8e78;
+      letter-spacing: 0.05em;
+    }
+
+    .check-btn {
+      background: #6b4e2a;
+      color: #f8f5ef;
+      border: none;
+      padding: 0.9rem 2.5rem;
+      border-radius: 12px;
+      font-family: 'Cormorant Garamond', 'Noto Serif JP', serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.1em;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 4px 16px rgba(107,78,42,0.18);
+    }
+
+    .check-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 24px rgba(107,78,42,0.25);
+    }
+
+    .check-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 8px rgba(107,78,42,0.12);
+    }
+
+    /* Results */
+    .results {
+      display: none;
+    }
+
+    .results.show {
+      display: block;
+    }
+
+    .result-box {
+      background: #fff;
+      border: 1px solid rgba(139,109,60,0.1);
+      border-radius: 16px;
+      padding: 2rem 1.5rem;
+      margin-bottom: 1.2rem;
+      text-align: center;
+      box-shadow: 0 2px 16px rgba(139,109,60,0.06);
+    }
+
+    .result-box .label {
+      font-family: 'Cormorant Garamond', 'Noto Serif JP', serif;
+      font-size: 0.75rem;
+      color: #9e8e78;
+      margin-bottom: 0.6rem;
+      letter-spacing: 0.15em;
+      font-weight: 600;
+    }
+
+    /* Grip */
+    .grip-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 4.2rem;
+      font-weight: 700;
+      color: #6b4e2a;
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+
+    .grip-kg {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem;
+      font-weight: 400;
+      color: #9e8e78;
+      margin-left: 0.2rem;
+    }
+
+    .grip-bar-wrap {
+      margin-top: 1.2rem;
+      background: #ede8df;
+      border-radius: 6px;
+      height: 8px;
+      overflow: hidden;
+    }
+
+    .grip-bar {
+      height: 100%;
+      border-radius: 6px;
+      background: linear-gradient(90deg, #a08050, #c9a96e, #dfc07a);
+      transition: width 1s ease;
+      width: 0%;
+    }
+
+    .grip-bar-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.65rem;
+      color: #b3a594;
+      margin-top: 4px;
+    }
+
+    /* Animal */
+    .animal-vs {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      margin: 1.2rem 0;
+    }
+
+    .animal-vs .emoji-float {
+      filter: drop-shadow(0 4px 12px rgba(107,78,42,0.2)) drop-shadow(0 1px 3px rgba(0,0,0,0.1));
+    }
+
+    .animal-vs .you {
+      font-size: 2.8rem;
+      position: relative;
+      display: inline-block;
+    }
+
+    .animal-vs .you .you-l {
+      display: inline-block;
+    }
+
+    .animal-vs .you .you-r,
+    .animal-vs .you .you-c,
+    .animal-vs .you .you-d {
+      position: absolute;
+      left: 0;
+      top: 0;
+      display: inline-block;
+    }
+
+    .animal-vs .you .you-c,
+    .animal-vs .you .you-d {
+      display: none;
+    }
+
+    .you[class*="torn-"] .you-c,
+    .you[class*="torn-"] .you-d,
+    .you[class*="punch-"] .you-c,
+    .you[class*="punch-"] .you-d {
+      display: inline-block;
+    }
+
+    /* 左右パカッ（控えめ） */
+    .you.split-1 .you-l { clip-path: inset(0 50% 0 0); transform: translateX(-5px) rotate(-10deg); }
+    .you.split-1 .you-r { clip-path: inset(0 0 0 50%); transform: translateX(5px) rotate(10deg); }
+
+    /* 左右ガバッ（大胆） */
+    .you.split-2 .you-l { clip-path: inset(0 50% 0 0); transform: translateX(-10px) rotate(-20deg); }
+    .you.split-2 .you-r { clip-path: inset(0 0 0 50%); transform: translateX(10px) rotate(20deg); }
+
+    /* 斜め斬り（右下がり） */
+    .you.split-3 .you-l { clip-path: polygon(0 0, 65% 0, 35% 100%, 0 100%); transform: translateX(-6px) rotate(-8deg); }
+    .you.split-3 .you-r { clip-path: polygon(65% 0, 100% 0, 100% 100%, 35% 100%); transform: translateX(6px) rotate(8deg); }
+
+    /* 斜め斬り（右上がり） */
+    .you.split-4 .you-l { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); clip-path: polygon(0 0, 35% 0, 65% 100%, 0 100%); transform: translateX(-6px) rotate(8deg); }
+    .you.split-4 .you-r { clip-path: polygon(35% 0, 100% 0, 100% 100%, 65% 100%); transform: translateX(6px) rotate(-8deg); }
+
+    /* 上下真っ二つ */
+    .you.split-5 .you-l { clip-path: inset(0 0 50% 0); transform: translateY(-5px) rotate(-5deg); }
+    .you.split-5 .you-r { clip-path: inset(50% 0 0 0); transform: translateY(5px) rotate(5deg); }
+
+    /* 片方落下 */
+    .you.split-6 .you-l { clip-path: inset(0 50% 0 0); transform: rotate(-3deg); }
+    .you.split-6 .you-r { clip-path: inset(0 0 0 50%); transform: translate(8px, 12px) rotate(25deg); }
+
+    /* 吹っ飛び */
+    .you.split-7 .you-l { clip-path: inset(0 50% 0 0); transform: translate(-12px, -6px) rotate(-30deg); }
+    .you.split-7 .you-r { clip-path: inset(0 0 0 50%); transform: translate(12px, 6px) rotate(30deg); }
+
+    /* ジグザグ断裂 */
+    .you.split-8 .you-l { clip-path: polygon(0 0, 55% 0, 45% 33%, 55% 66%, 45% 100%, 0 100%); transform: translateX(-5px) rotate(-6deg); }
+    .you.split-8 .you-r { clip-path: polygon(55% 0, 100% 0, 100% 100%, 45% 100%, 55% 66%, 45% 33%); transform: translateX(5px) rotate(6deg); }
+
+    /* === ビリビリ引きちぎり === */
+
+    /* 四方にビリビリ */
+    .you.torn-1 .you-l { clip-path: polygon(0 0, 53% 0, 50% 50%, 0 47%); transform: translate(-8px, -6px) rotate(-15deg); }
+    .you.torn-1 .you-r { clip-path: polygon(53% 0, 100% 0, 100% 47%, 50% 50%); transform: translate(8px, -5px) rotate(12deg); }
+    .you.torn-1 .you-c { clip-path: polygon(0 47%, 50% 50%, 47% 100%, 0 100%); transform: translate(-6px, 7px) rotate(-10deg); }
+    .you.torn-1 .you-d { clip-path: polygon(50% 50%, 100% 47%, 100% 100%, 47% 100%); transform: translate(10px, 8px) rotate(18deg); }
+
+    /* 縦にビリビリ4枚 */
+    .you.torn-2 .you-l { clip-path: polygon(0 0, 28% 0, 25% 50%, 27% 100%, 0 100%); transform: translate(-10px, -4px) rotate(-14deg); }
+    .you.torn-2 .you-r { clip-path: polygon(28% 0, 55% 0, 52% 50%, 54% 100%, 27% 100%, 25% 50%); transform: translate(-2px, 5px) rotate(6deg); }
+    .you.torn-2 .you-c { clip-path: polygon(55% 0, 80% 0, 77% 50%, 79% 100%, 54% 100%, 52% 50%); transform: translate(3px, -3px) rotate(-4deg); }
+    .you.torn-2 .you-d { clip-path: polygon(80% 0, 100% 0, 100% 100%, 79% 100%, 77% 50%); transform: translate(10px, 3px) rotate(12deg); }
+
+    /* 大爆散 */
+    .you.torn-3 .you-l { clip-path: polygon(0 0, 52% 0, 50% 50%, 0 48%); transform: translate(-15px, -12px) rotate(-28deg); }
+    .you.torn-3 .you-r { clip-path: polygon(52% 0, 100% 0, 100% 48%, 50% 50%); transform: translate(15px, -10px) rotate(25deg); }
+    .you.torn-3 .you-c { clip-path: polygon(0 48%, 50% 50%, 48% 100%, 0 100%); transform: translate(-12px, 12px) rotate(-22deg); }
+    .you.torn-3 .you-d { clip-path: polygon(50% 50%, 100% 48%, 100% 100%, 48% 100%); transform: translate(18px, 14px) rotate(32deg); }
+
+    /* 横にビリビリ4枚 */
+    .you.torn-4 .you-l { clip-path: polygon(0 0, 100% 0, 100% 28%, 50% 26%, 0 28%); transform: translate(2px, -8px) rotate(-7deg); }
+    .you.torn-4 .you-r { clip-path: polygon(0 28%, 50% 26%, 100% 28%, 100% 55%, 50% 53%, 0 55%); transform: translate(-3px, 2px) rotate(5deg); }
+    .you.torn-4 .you-c { clip-path: polygon(0 55%, 50% 53%, 100% 55%, 100% 80%, 50% 78%, 0 80%); transform: translate(4px, -1px) rotate(-3deg); }
+    .you.torn-4 .you-d { clip-path: polygon(0 80%, 50% 78%, 100% 80%, 100% 100%, 0 100%); transform: translate(-2px, 8px) rotate(6deg); }
+
+    /* X字にビリビリ */
+    .you.torn-5 .you-l { clip-path: polygon(0 0, 100% 0, 50% 50%); transform: translate(0, -8px) rotate(-10deg); }
+    .you.torn-5 .you-r { clip-path: polygon(100% 0, 100% 100%, 50% 50%); transform: translate(8px, 0) rotate(8deg); }
+    .you.torn-5 .you-c { clip-path: polygon(100% 100%, 0 100%, 50% 50%); transform: translate(0, 8px) rotate(10deg); }
+    .you.torn-5 .you-d { clip-path: polygon(0 100%, 0 0, 50% 50%); transform: translate(-8px, 0) rotate(-8deg); }
+
+    /* 不規則にバラバラ */
+    .you.torn-6 .you-l { clip-path: polygon(0 0, 60% 0, 40% 45%, 0 35%); transform: translate(-10px, -8px) rotate(-18deg); }
+    .you.torn-6 .you-r { clip-path: polygon(60% 0, 100% 0, 100% 55%, 40% 45%); transform: translate(12px, -6px) rotate(15deg); }
+    .you.torn-6 .you-c { clip-path: polygon(40% 45%, 100% 55%, 100% 100%, 55% 100%); transform: translate(4px, 10px) rotate(8deg); }
+    .you.torn-6 .you-d { clip-path: polygon(0 35%, 40% 45%, 55% 100%, 0 100%); transform: translate(-8px, 8px) rotate(-12deg); }
+
+    /* === 顔面殴打（中心めり込み） === */
+
+    /* 正面からドン */
+    .you.punch-1 .you-l { clip-path: polygon(0 0, 50% 0, 50% 50%, 0 50%); transform: perspective(250px) rotateY(-8deg) rotateX(-8deg); transform-origin: top left; }
+    .you.punch-1 .you-r { clip-path: polygon(50% 0, 100% 0, 100% 50%, 50% 50%); transform: perspective(250px) rotateY(8deg) rotateX(-8deg); transform-origin: top right; }
+    .you.punch-1 .you-c { clip-path: polygon(0 50%, 50% 50%, 50% 100%, 0 100%); transform: perspective(250px) rotateY(-8deg) rotateX(8deg); transform-origin: bottom left; }
+    .you.punch-1 .you-d { clip-path: polygon(50% 50%, 100% 50%, 100% 100%, 50% 100%); transform: perspective(250px) rotateY(8deg) rotateX(8deg); transform-origin: bottom right; }
+
+    /* 右ストレート */
+    .you.punch-2 .you-l { clip-path: polygon(0 0, 50% 0, 50% 50%, 0 50%); transform: perspective(250px) rotateY(-4deg) rotateX(-4deg); transform-origin: top left; }
+    .you.punch-2 .you-r { clip-path: polygon(50% 0, 100% 0, 100% 50%, 50% 50%); transform: perspective(180px) rotateY(15deg) rotateX(-6deg); transform-origin: top right; }
+    .you.punch-2 .you-c { clip-path: polygon(0 50%, 50% 50%, 50% 100%, 0 100%); transform: perspective(250px) rotateY(-4deg) rotateX(4deg); transform-origin: bottom left; }
+    .you.punch-2 .you-d { clip-path: polygon(50% 50%, 100% 50%, 100% 100%, 50% 100%); transform: perspective(180px) rotateY(15deg) rotateX(6deg); transform-origin: bottom right; }
+
+    /* 上から叩き潰し */
+    .you.punch-3 .you-l { clip-path: polygon(0 0, 50% 0, 50% 50%, 0 50%); transform: perspective(180px) rotateY(-5deg) rotateX(-15deg); transform-origin: top left; }
+    .you.punch-3 .you-r { clip-path: polygon(50% 0, 100% 0, 100% 50%, 50% 50%); transform: perspective(180px) rotateY(5deg) rotateX(-15deg); transform-origin: top right; }
+    .you.punch-3 .you-c { clip-path: polygon(0 50%, 50% 50%, 50% 100%, 0 100%); transform: perspective(300px) rotateY(-3deg) rotateX(4deg); transform-origin: bottom left; }
+    .you.punch-3 .you-d { clip-path: polygon(50% 50%, 100% 50%, 100% 100%, 50% 100%); transform: perspective(300px) rotateY(3deg) rotateX(4deg); transform-origin: bottom right; }
+
+    /* アッパーカット */
+    .you.punch-4 .you-l { clip-path: polygon(0 0, 50% 0, 50% 50%, 0 50%); transform: perspective(300px) rotateY(-3deg) rotateX(-4deg); transform-origin: top left; }
+    .you.punch-4 .you-r { clip-path: polygon(50% 0, 100% 0, 100% 50%, 50% 50%); transform: perspective(300px) rotateY(3deg) rotateX(-4deg); transform-origin: top right; }
+    .you.punch-4 .you-c { clip-path: polygon(0 50%, 50% 50%, 50% 100%, 0 100%); transform: perspective(180px) rotateY(-5deg) rotateX(15deg); transform-origin: bottom left; }
+    .you.punch-4 .you-d { clip-path: polygon(50% 50%, 100% 50%, 100% 100%, 50% 100%); transform: perspective(180px) rotateY(5deg) rotateX(15deg); transform-origin: bottom right; }
+
+    /* 左フック */
+    .you.punch-5 .you-l { clip-path: polygon(0 0, 50% 0, 50% 50%, 0 50%); transform: perspective(180px) rotateY(-15deg) rotateX(-6deg); transform-origin: top left; }
+    .you.punch-5 .you-r { clip-path: polygon(50% 0, 100% 0, 100% 50%, 50% 50%); transform: perspective(250px) rotateY(4deg) rotateX(-4deg); transform-origin: top right; }
+    .you.punch-5 .you-c { clip-path: polygon(0 50%, 50% 50%, 50% 100%, 0 100%); transform: perspective(180px) rotateY(-15deg) rotateX(6deg); transform-origin: bottom left; }
+    .you.punch-5 .you-d { clip-path: polygon(50% 50%, 100% 50%, 100% 100%, 50% 100%); transform: perspective(250px) rotateY(4deg) rotateX(4deg); transform-origin: bottom right; }
+
+    /* めり込みパンチ */
+    .you.punch-6 .you-l { clip-path: polygon(0 0, 50% 0, 50% 50%, 0 50%); transform: perspective(130px) rotateY(-15deg) rotateX(-15deg); transform-origin: top left; }
+    .you.punch-6 .you-r { clip-path: polygon(50% 0, 100% 0, 100% 50%, 50% 50%); transform: perspective(130px) rotateY(15deg) rotateX(-15deg); transform-origin: top right; }
+    .you.punch-6 .you-c { clip-path: polygon(0 50%, 50% 50%, 50% 100%, 0 100%); transform: perspective(130px) rotateY(-15deg) rotateX(15deg); transform-origin: bottom left; }
+    .you.punch-6 .you-d { clip-path: polygon(50% 50%, 100% 50%, 100% 100%, 50% 100%); transform: perspective(130px) rotateY(15deg) rotateX(15deg); transform-origin: bottom right; }
+
+    /* ぐにゃあ (warp) — SVG filter で波状歪み */
+    .you.warp-1 { filter: url(#warpFilter1); }
+    .you.warp-2 { filter: url(#warpFilter2); }
+    .you.warp-3 { filter: url(#warpFilter3); }
+    .you.warp-4 { filter: url(#warpFilter4); }
+
+    /* ぐちゃっ (crush) — scaleX 潰し + SVG波状フィルタで紐くにゃくにゃ */
+    .you.crush-1 .you-l, .you.crush-1 .you-r, .you.crush-1 .you-c, .you.crush-1 .you-d,
+    .you.crush-2 .you-l, .you.crush-2 .you-r, .you.crush-2 .you-c, .you.crush-2 .you-d,
+    .you.crush-3 .you-l, .you.crush-3 .you-r, .you.crush-3 .you-c, .you.crush-3 .you-d,
+    .you.crush-4 .you-l, .you.crush-4 .you-r, .you.crush-4 .you-c, .you.crush-4 .you-d {
+      display: inline; clip-path: none;
+    }
+    .you.crush-1 { transform: scaleX(0.25) scaleY(1.2); filter: url(#crushFilter1); }
+    .you.crush-2 { transform: scaleX(0.3) skewY(12deg); filter: url(#crushFilter2); }
+    .you.crush-3 { transform: scaleX(0.12) scaleY(1.4); filter: url(#crushFilter3); }
+    .you.crush-4 { transform: scaleX(0.2) rotate(6deg) skewY(-8deg); filter: url(#crushFilter4); }
+
+    .animal-vs .vs {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 400;
+      font-size: 0.8rem;
+      color: #b3a594;
+      letter-spacing: 0.15em;
+      font-style: italic;
+    }
+
+    .animal-vs .them {
+      font-size: 2.8rem;
+    }
+
+    /* 虫系アイコンはモザイク（苦手な方配慮） */
+    .animal-vs .them.animal-emoji-mosaic {
+      filter: blur(6px);
+      opacity: 0.92;
+    }
+
+    .animal-name {
+      font-family: 'Noto Serif JP', serif;
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: #3a3028;
+      letter-spacing: 0.06em;
+    }
+
+    .animal-grip-tag {
+      display: inline-block;
+      background: #f0ebe2;
+      padding: 0.25rem 1rem;
+      border-radius: 20px;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #8b6d3c;
+      margin: 0.5rem 0;
+      border: 1px solid rgba(139,109,60,0.15);
+      letter-spacing: 0.06em;
+    }
+
+    .animal-trivia {
+      font-size: 0.78rem;
+      color: #7a6e60;
+      margin-top: 1rem;
+      padding: 0.8rem 1rem;
+      background: #faf7f2;
+      border-radius: 10px;
+      text-align: center;
+      font-style: italic;
+      line-height: 1.6;
+      border-left: 2px solid rgba(139,109,60,0.25);
+    }
+
+    .animal-deaths {
+      font-size: 0.7rem;
+      color: #b3a594;
+      margin-top: 0.5rem;
+      letter-spacing: 0.03em;
+    }
+
+    /* Actions */
+    .actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 0.8rem;
+    }
+
+    .retry-btn, .share-btn {
+      padding: 0.7rem 1.5rem;
+      border-radius: 12px;
+      font-family: 'Cormorant Garamond', 'Noto Serif JP', serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      letter-spacing: 0.06em;
+    }
+
+    .retry-btn {
+      background: #fff;
+      border: 1px solid #ddd2c2;
+      color: #8b6d3c;
+    }
+
+    .retry-btn:hover {
+      border-color: #b3a594;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(139,109,60,0.08);
+    }
+
+    .share-btn {
+      background: #6b4e2a;
+      border: none;
+      color: #f8f5ef;
+    }
+
+    .share-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(107,78,42,0.2);
+    }
+
+    .copied-toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #6b4e2a;
+      color: #f8f5ef;
+      padding: 0.7rem 1.5rem;
+      border-radius: 12px;
+      font-family: 'Noto Serif JP', serif;
+      font-weight: 700;
+      font-size: 0.85rem;
+      transition: transform 0.3s;
+      z-index: 100;
+      letter-spacing: 0.04em;
+    }
+
+    .copied-toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(139,109,60,0.1);
+      font-size: 0.7rem;
+      color: #b3a594;
+      letter-spacing: 0.05em;
+    }
+
+    .ad-area {
+      margin-top: 2rem;
+      text-align: center;
+    }
+
+    @media (max-width: 480px) {
+      .container { padding: 2rem 1rem; }
+      .header h1 { font-size: 1.35rem; }
+      .grip-num { font-size: 3.4rem; }
+      .animal-vs .you, .animal-vs .them { font-size: 2.4rem; }
+    }
+    /* Gravity fall animation */
+    @keyframes gravity-fall {
+      0% { transform: translateY(0); opacity: 1; }
+      60% { opacity: 1; }
+      100% { transform: translateY(120vh); opacity: 0; }
+    }
+
+    .gravity-falling .header { animation: gravity-fall 1.2s cubic-bezier(0.55, 0, 1, 0.45) forwards; animation-delay: 0s; }
+    .gravity-falling .input-area { animation: gravity-fall 1.2s cubic-bezier(0.55, 0, 1, 0.45) forwards; animation-delay: 0.08s; }
+    /* results内の子要素を個別に落下（animalTrivia以外） */
+    .gravity-falling .results .result-box { animation: gravity-fall 1.2s cubic-bezier(0.55, 0, 1, 0.45) forwards; animation-delay: 0.16s; }
+    .gravity-falling .results .actions { animation: gravity-fall 1.2s cubic-bezier(0.55, 0, 1, 0.45) forwards; animation-delay: 0.20s; }
+    .gravity-falling .footer { animation: gravity-fall 1.2s cubic-bezier(0.55, 0, 1, 0.45) forwards; animation-delay: 0.24s; }
+    .gravity-falling .ad-area { animation: gravity-fall 1.2s cubic-bezier(0.55, 0, 1, 0.45) forwards; animation-delay: 0.32s; }
+
+    /* 暗転後のフォーチュンクッキー（損壊条文） */
+    #blackoutFortune {
+      display: none;
+      position: fixed;
+      bottom: 8vh;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10001;
+      color: #fff;
+      font-size: 0.95rem;
+      font-style: italic;
+      line-height: 2;
+      text-align: center;
+      max-width: 80vw;
+      opacity: 0;
+      transition: opacity 1.2s ease;
+    }
+    #blackoutFortune.show {
+      display: block;
+      opacity: 1;
+    }
+
+    .confetti-bg.gravity-falling .confetti-piece {
+      animation: gravity-fall 1.0s cubic-bezier(0.55, 0, 1, 0.45) forwards !important;
+    }
+
+    /* 暗転オーバーレイ */
+    .blackout-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      background: #000;
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+    .blackout-overlay.active {
+      display: block;
+    }
+    .blackout-overlay.fade-in {
+      opacity: 1;
+    }
+
+    /* 不正値エフェクト: body層 + .container層に重ね掛け */
+    body.site-warped, .container.site-warped {
+      filter: url(#siteWarpFilter);
+    }
+    /* 文字化け */
+    body.site-garble .container { }
+    /* 紙吹雪接近 */
+    .confetti-bg.site-confetti-rush .confetti-piece {
+      animation: confetti-rush 1.8s ease-in forwards !important;
+      opacity: 1 !important;
+    }
+    @keyframes confetti-rush {
+      0%   { transform: scale(1) translateZ(0); opacity: 0.18; }
+      60%  { transform: scale(8) translateZ(200px); opacity: 0.7; }
+      100% { transform: scale(30) translateZ(500px); opacity: 1; filter: blur(2px); }
+    }
+
+  </style>
+</head>
+<body>
+  <!-- SVG filters for warp effects -->
+  <svg style="position:absolute;width:0;height:0;">
+    <defs>
+      <filter id="warpFilter1"><feTurbulence type="turbulence" baseFrequency="0.04" numOctaves="2" result="turb"/><feDisplacementMap in="SourceGraphic" in2="turb" scale="18" xChannelSelector="R" yChannelSelector="G"/></filter>
+      <filter id="warpFilter2"><feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="3" result="turb"/><feDisplacementMap in="SourceGraphic" in2="turb" scale="25" xChannelSelector="R" yChannelSelector="B"/></filter>
+      <filter id="warpFilter3"><feTurbulence type="turbulence" baseFrequency="0.03 0.08" numOctaves="2" result="turb"/><feDisplacementMap in="SourceGraphic" in2="turb" scale="20" xChannelSelector="G" yChannelSelector="R"/></filter>
+      <filter id="warpFilter4"><feTurbulence type="turbulence" baseFrequency="0.08" numOctaves="4" result="turb"/><feDisplacementMap in="SourceGraphic" in2="turb" scale="35" xChannelSelector="R" yChannelSelector="G"/></filter>
+      <filter id="crushFilter1"><feTurbulence type="turbulence" baseFrequency="0.02 0.12" numOctaves="3" result="turb"/><feDisplacementMap in="SourceGraphic" in2="turb" scale="22" xChannelSelector="R" yChannelSelector="G"/></filter>
+      <filter id="crushFilter2"><feTurbulence type="fractalNoise" baseFrequency="0.03 0.15" numOctaves="4" result="turb"/><feDisplacementMap in="SourceGraphic" in2="turb" scale="28" xChannelSelector="G" yChannelSelector="R"/></filter>
+      <filter id="crushFilter3"><feTurbulence type="turbulence" baseFrequency="0.015 0.18" numOctaves="3" result="turb"/><feDisplacementMap in="SourceGraphic" in2="turb" scale="30" xChannelSelector="R" yChannelSelector="B"/></filter>
+      <filter id="crushFilter4"><feTurbulence type="fractalNoise" baseFrequency="0.04 0.2" numOctaves="5" result="turb"/><feDisplacementMap in="SourceGraphic" in2="turb" scale="35" xChannelSelector="G" yChannelSelector="B"/></filter>
+      <filter id="siteWarpFilter"><feTurbulence type="turbulence" baseFrequency="0.015" numOctaves="3" result="turb" seed="3"/><feDisplacementMap id="siteWarpDisp" in="SourceGraphic" in2="turb" scale="0" xChannelSelector="R" yChannelSelector="G"/></filter>
+    </defs>
+  </svg>
+
+  <div class="confetti-bg" id="confettiBg"></div>
+
+  <div class="container">
+    <header class="header">
+      <h1>紙ちぎり握力チェッカー&#8220;鑷&#8221;</h1>
+      <div class="sub">重ねてちぎった紙の枚数から握力を推定します</div>
+    </header>
+
+    <div class="input-area">
+      <label>何枚ちぎった？</label>
+      <div class="input-row">
+        <input type="number" class="sheets-input" id="sheetsInput" step="any" placeholder="?">
+        <span class="unit">枚</span>
+      </div>
+      <button class="check-btn" onclick="checkGrip()">診断する</button>
+    </div>
+
+    <div class="results" id="results">
+
+      <div class="result-box">
+        <div class="label">推定握力</div>
+        <div>
+          <span class="grip-num" id="gripValue">0</span>
+          <span class="grip-kg">kg</span>
+        </div>
+        <div class="grip-bar-wrap">
+          <div class="grip-bar" id="gripBar"></div>
+        </div>
+        <div class="grip-bar-labels">
+          <span>0</span>
+          <span>成人平均(40kg)</span>
+          <span>100+</span>
+        </div>
+      </div>
+
+      <div class="result-box">
+        <div class="label">ぎりぎり負ける動物</div>
+        <div class="animal-vs">
+          <span class="you split-1 emoji-float"><span class="you-l">🧑</span><span class="you-r">🧑</span><span class="you-c">🧑</span><span class="you-d">🧑</span></span>
+          <span class="vs">VS</span>
+          <span class="them emoji-float" id="animalEmoji">🐱</span>
+        </div>
+        <div class="animal-name" id="animalName">ネコ</div>
+        <div class="animal-grip-tag" id="animalGrip">握力 5kg</div>
+        <div class="animal-trivia" id="animalTrivia"></div>
+        <div class="animal-deaths" id="animalDeaths"></div>
+      </div>
+
+      <div class="actions">
+        <button class="retry-btn" onclick="retry()">もう1回</button>
+        <button class="share-btn" onclick="shareResult()">結果をコピー</button>
+      </div>
+    </div>
+
+    <footer class="footer"></footer>
+
+    <!-- TODO: data-ad-slot を自分の広告ユニットIDに置き換える -->
+    <div class="ad-area">
+      <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+        data-ad-slot="XXXXXXXXXX"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+    </div>
+  </div>
+
+  <div class="copied-toast" id="copiedToast">コピーした</div>
+  <div class="blackout-overlay" id="blackoutOverlay"></div>
+  <div id="blackoutFortune"></div>
+
+
+  <script src="fortune-data.js"></script>
+  <script src="animal-data.js"></script>
+  <script>
+    // 紙吹雪背景の生成
+    (() => {
+      const people = ['🧑','👨','👩','🧒','👦','👧','👶','🧓','👴','👵','👨‍🦰','👩‍🦰','👨‍🦱','👩‍🦱','👨‍🦳','👩‍🦳','👱‍♂️','👱‍♀️','🧔','👲','🤴','👸','👷','💂','🧑‍🚀','🧑‍🎤','🧑‍💻','🧑‍🔬','🧑‍🏫','🧑‍🌾','🧑‍⚕️','🧑‍🎨','🤸','🏃','🚶','🧎','🏋️','🧗','🏄','🚴'];
+      const tearShapes = [
+        'polygon(0% 0%, 58% 0%, 52% 48%, 0% 42%)',
+        'polygon(42% 0%, 100% 0%, 100% 46%, 48% 52%)',
+        'polygon(0% 52%, 52% 48%, 56% 100%, 0% 100%)',
+        'polygon(48% 52%, 100% 46%, 100% 100%, 44% 100%)',
+        'polygon(5% 0%, 52% 0%, 48% 100%, 0% 100%)',
+        'polygon(50% 0%, 100% 0%, 100% 100%, 46% 100%)',
+        'polygon(0% 0%, 100% 0%, 96% 52%, 4% 56%)',
+        'polygon(4% 48%, 96% 44%, 100% 100%, 0% 100%)',
+      ];
+      const bg = document.getElementById('confettiBg');
+      const count = 35;
+      for (let i = 0; i < count; i++) {
+        const el = document.createElement('span');
+        el.className = 'confetti-piece';
+        el.textContent = people[Math.floor(Math.random() * people.length)];
+        el.style.left = (Math.random() * 100) + '%';
+        el.style.fontSize = (1.0 + Math.random() * 1.4) + 'rem';
+        el.style.opacity = 0.07 + Math.random() * 0.09;
+        el.style.animationDuration = (14 + Math.random() * 22) + 's';
+        el.style.animationDelay = -(Math.random() * 35) + 's';
+        el.style.clipPath = tearShapes[Math.floor(Math.random() * tearShapes.length)];
+        bg.appendChild(el);
+      }
+    })();
+
+    const animalTiers = window.__ANIMAL_DATA__.animalTiers;
+
+
+        const quotes = window.__FORTUNE_DATA__.quotes;
+
+
+    function calculateGrip(sheets) {
+      if (sheets <= 0) return 0;
+      return Math.round(sheets * 2.5 + Math.pow(sheets, 1.15) * 0.8);
+    }
+
+    const humanFallback = { name: '人間', emoji: '🧑', grip: '???', deaths: -1 };
+
+    function findAnimal(grip) {
+      if (grip >= 700) return humanFallback;
+      for (const tier of animalTiers) {
+        if (grip >= tier.min && grip < tier.max) {
+          const a = tier.animals;
+          return a[Math.floor(Math.random() * a.length)];
+        }
+      }
+      const last = animalTiers[animalTiers.length - 1];
+      return last.animals[Math.floor(Math.random() * last.animals.length)];
+    }
+
+
+    function checkGrip() {
+      const input = document.getElementById('sheetsInput');
+      const raw = input.value.trim();
+      const sheets = parseFloat(raw);
+
+      // 入力検証: 数値でない・無限・0 は弾く（OWASP A03: Injection対策としてサニタイズ）
+      if (raw === '' || !isFinite(sheets) || sheets === 0) {
+        input.style.borderColor = '#e74c3c';
+        input.focus();
+        setTimeout(() => { input.style.borderColor = '#ccc'; }, 1500);
+        return;
+      }
+
+      // マイナス値・小数値: サイト全体にランダム異常エフェクト
+      if (sheets < 0 || !Number.isInteger(sheets)) {
+        triggerSiteGlitch();
+        return;
+      }
+
+      const grip = calculateGrip(Math.min(sheets, 999));
+      const animal = findAnimal(grip);
+
+      // Grip
+      const gripEl = document.getElementById('gripValue');
+      animateNumber(gripEl, 0, grip, 800);
+
+      const barPct = Math.min((grip / 120) * 100, 100);
+      setTimeout(() => {
+        document.getElementById('gripBar').style.width = barPct + '%';
+      }, 200);
+
+      // Damage variation
+      const youEl = document.querySelector('.you');
+      const effects = [
+        'split-1','split-2','split-3','split-4','split-5','split-6','split-7','split-8',
+        'torn-1','torn-2','torn-3','torn-4','torn-5','torn-6',
+        'punch-1','punch-2','punch-3','punch-4','punch-5','punch-6',
+        'warp-1','warp-2','warp-3','warp-4',
+        'crush-1','crush-2','crush-3','crush-4',
+      ];
+      youEl.className = 'you emoji-float ' + effects[Math.floor(Math.random() * effects.length)];
+
+      // Animal（虫系はモザイク表示）
+      const animalEmojiEl = document.getElementById('animalEmoji');
+      const insectEmojis = new Set(['🐛', '🪲', '🐜', '🦗', '🦋']);
+      animalEmojiEl.textContent = animal.emoji;
+      animalEmojiEl.classList.toggle('animal-emoji-mosaic', insectEmojis.has(animal.emoji));
+      document.getElementById('animalName').textContent = animal.name;
+      document.getElementById('animalGrip').textContent = `握力 ${animal.grip}kg`;
+      const quote = quotes[Math.floor(Math.random() * quotes.length)];
+      document.getElementById('animalTrivia').textContent = `${quote.text} ── ${quote.author}`;
+      document.getElementById('animalDeaths').textContent =
+        animal.deaths < 0 ? '' :
+        animal.deaths === 0 ? '年間の犠牲者数: 0人' : `年間の犠牲者数: 約${animal.deaths.toLocaleString()}人`;
+
+      // Show
+      const results = document.getElementById('results');
+      results.classList.remove('show');
+      void results.offsetWidth;
+      results.classList.add('show');
+
+      setTimeout(() => {
+        results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+
+      window._lastResult = { sheets, grip, animal };
+
+      // Gravity fall trigger for humanFallback (grip >= 700)
+      if (animal === humanFallback) {
+        setTimeout(() => triggerGravityFall(), 900);
+      }
+    }
+
+    function animateNumber(el, from, to, duration) {
+      const start = performance.now();
+      const update = (now) => {
+        const elapsed = now - start;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        el.textContent = Math.round(from + (to - from) * eased);
+        if (progress < 1) requestAnimationFrame(update);
+      };
+      requestAnimationFrame(update);
+    }
+
+    function retry() {
+      document.getElementById('results').classList.remove('show');
+      document.getElementById('gripBar').style.width = '0%';
+      document.getElementById('sheetsInput').value = '';
+      document.getElementById('sheetsInput').focus();
+      // gravity-fall / blackout状態のリセット
+      document.querySelector('.container').classList.remove('gravity-falling');
+      document.getElementById('confettiBg').classList.remove('gravity-falling');
+      const overlay = document.getElementById('blackoutOverlay');
+      overlay.classList.remove('fade-in', 'active');
+      const fortune = document.getElementById('blackoutFortune');
+      fortune.classList.remove('show');
+      fortune.innerHTML = '';
+      // サイトグリッチエフェクトリセット
+      clearSiteGlitch();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function shareResult() {
+      if (!window._lastResult) return;
+      const { sheets, grip, animal } = window._lastResult;
+      const text = [
+        '紙ちぎり握力チェッカー"鑷"の結果',
+        '',
+        `ちぎった紙: ${sheets}枚`,
+        `推定握力: ${grip}kg`,
+        `ぎりぎり負ける動物: ${animal.emoji} ${animal.name}（${animal.grip}kg）`,
+        '',
+        '#紙ちぎり握力チェッカー鑷',
+      ].join('\n');
+
+      navigator.clipboard.writeText(text).then(() => {
+        showToast();
+      }).catch(() => {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        showToast();
+      });
+    }
+
+    function showToast() {
+      const t = document.getElementById('copiedToast');
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2000);
+    }
+
+    const blackoutLaws = (window.__FORTUNE_DATA__.quotes || []).filter(q => q.category === '驚きの実在法令');
+
+    const siteGlitchClasses = [
+      'site-warped',
+      'site-garble', 'site-confetti-rush',
+    ];
+
+    // 文字化け用: 各テキストノードの元テキストを保存
+    // 漢字検定1級の難読漢字（文字化け用）
+    const garbleChars = '鑷靨齏齟齣齧齲齶齷龕龜龝龠纛纜纝纃纈纊纋纎纐纑纒纓纔纕纗纘纙纚纛繆繇繎繐繒繓織繕繖繗繘繙繚繞繟繠繡繢繣繤繥繦繧繨繩繪繫繬繭繮繯繰繱繲繳繴繵繶繷繸繹繺繻繼繽繾繿纀纁纂纃纄纅纆纇纈纉纊纋續纍纎纏纐纑纒纓纔纕纖纗纘纙纚纛鬮鬯鬱鬲鬳鬴鬵鬶鬷鬸鬹鬺鑈鑌鑐鑒鑕鑗鑙鑛鑞鑠鑢鑤鑥鑨鑪鑫鑬鑭鑮鑯鑰鑱鑲鑳鑴鑵鑶鑷鑸鑹鑺鑻鑼鑽鑾鑿钀钁钂钃钄钅钆钇针钉钊钋钌钍钎钏钐钑钒钓钔钕钖钗钘钙钚钛钜钝钞钟钠钡钢钣钤钥钦钧钨钩钪钫钬钭钮钯钰钱钲钳钴钵钶钷钸钹钺钻钼钽钾钿铀铁铂铃铄铅铆铇铈铉铊铋铌铍铎铏铐铑铒铓铔铕铖铗铘铙铚铛';
+
+    let garbleInterval = null;
+    let garbleOriginals = [];
+
+    function startGarble() {
+      const container = document.querySelector('.container');
+      const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
+      garbleOriginals = [];
+      while (walker.nextNode()) {
+        const n = walker.currentNode;
+        if (n.textContent.trim()) {
+          garbleOriginals.push({ node: n, text: n.textContent });
+        }
+      }
+      garbleInterval = setInterval(() => {
+        for (const { node, text } of garbleOriginals) {
+          let garbled = '';
+          for (let i = 0; i < text.length; i++) {
+            if (text[i] === ' ' || text[i] === '\n') { garbled += text[i]; continue; }
+            garbled += garbleChars[Math.floor(Math.random() * garbleChars.length)];
+          }
+          node.textContent = garbled;
+        }
+      }, 50);
+    }
+
+    function stopGarble() {
+      if (garbleInterval) { clearInterval(garbleInterval); garbleInterval = null; }
+      for (const { node, text } of garbleOriginals) node.textContent = text;
+      garbleOriginals = [];
+    }
+
+    function startConfettiRush() {
+      const bg = document.getElementById('confettiBg');
+      bg.classList.add('site-confetti-rush');
+      const pieces = bg.querySelectorAll('.confetti-piece');
+      pieces.forEach(p => {
+        p.style.animationDelay = (Math.random() * 0.8) + 's';
+      });
+    }
+
+    function stopConfettiRush() {
+      const bg = document.getElementById('confettiBg');
+      bg.classList.remove('site-confetti-rush');
+      bg.querySelectorAll('.confetti-piece').forEach(p => {
+        p.style.animationDelay = -(Math.random() * 35) + 's';
+      });
+    }
+
+    function clearSiteGlitch() {
+      const container = document.querySelector('.container');
+      siteGlitchClasses.forEach(c => {
+        document.body.classList.remove(c);
+        container.classList.remove(c);
+      });
+      document.getElementById('siteWarpDisp').setAttribute('scale', '0');
+      stopGarble();
+      stopConfettiRush();
+    }
+
+    function animateSiteWarp(target) {
+      const disp = document.getElementById('siteWarpDisp');
+      disp.setAttribute('scale', '0');
+      target.classList.add('site-warped');
+      const duration = 1500, maxScale = 60;
+      const start = performance.now();
+      function tick(now) {
+        const t = Math.min((now - start) / duration, 1);
+        disp.setAttribute('scale', String(Math.round(maxScale * (t * (2 - t)))));
+        if (t < 1) requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    }
+
+    function applyGlitchEffect(cls, target) {
+      if (cls === 'site-warped') {
+        animateSiteWarp(target);
+      } else if (cls === 'site-garble') {
+        startGarble();
+      } else if (cls === 'site-confetti-rush') {
+        startConfettiRush();
+      } else {
+        requestAnimationFrame(() => target.classList.add(cls));
+      }
+    }
+
+    function triggerSiteGlitch() {
+      clearSiteGlitch();
+      const container = document.querySelector('.container');
+      const pool = siteGlitchClasses.slice();
+      // primary → body
+      const pi = Math.floor(Math.random() * pool.length);
+      const primary = pool.splice(pi, 1)[0];
+      applyGlitchEffect(primary, document.body);
+
+      // ぐにゃり以外は1〜2個の別エフェクトを重ね掛け
+      if (primary !== 'site-warped') {
+        const numExtra = 1 + Math.floor(Math.random() * 2);
+        for (let i = 0; i < numExtra && pool.length > 0; i++) {
+          const ei = Math.floor(Math.random() * pool.length);
+          const extra = pool.splice(ei, 1)[0];
+          applyGlitchEffect(extra, container);
+        }
+      }
+    }
+
+    function triggerGravityFall() {
+      document.querySelector('.container').classList.add('gravity-falling');
+      document.getElementById('confettiBg').classList.add('gravity-falling');
+      // 暗転オーバーレイを表示
+      const overlay = document.getElementById('blackoutOverlay');
+      overlay.classList.add('active');
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          overlay.classList.add('fade-in');
+        });
+      });
+      // 暗転完了後に驚きの実在法令を表示
+      setTimeout(() => {
+        const laws = blackoutLaws.length ? blackoutLaws : (window.__FORTUNE_DATA__.quotes || []).slice(0, 1);
+        const law = laws[Math.floor(Math.random() * laws.length)];
+        const fortuneEl = document.getElementById('blackoutFortune');
+        fortuneEl.innerHTML = law ? `${law.text}<br><br>──${law.author}` : '';
+        fortuneEl.classList.add('show');
+      }, 1800);
+    }
+
+    document.getElementById('sheetsInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') checkGrip();
+    });
+  </script>
+</body>
+</html>
