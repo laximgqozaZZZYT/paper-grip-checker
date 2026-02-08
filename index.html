@@ -602,13 +602,6 @@
     body.site-warped, .container.site-warped {
       filter: url(#siteWarpFilter);
     }
-    body.site-melt, .container.site-melt {
-      animation: sitemelt 2.5s ease forwards;
-    }
-    @keyframes sitemelt {
-      0%   { filter: blur(0px); opacity: 1; transform: scaleY(1); }
-      100% { filter: blur(15px); opacity: 0.2; transform: scaleY(2.5) translateY(30vh); }
-    }
     body.site-pixelate, .container.site-pixelate {
       animation: sitepixelate 2s steps(8) forwards;
     }
@@ -1465,12 +1458,13 @@
     ];
 
     const siteGlitchClasses = [
-      'site-warped', 'site-melt', 'site-pixelate',
+      'site-warped', 'site-pixelate',
       'site-garble', 'site-confetti-rush',
     ];
 
     // 文字化け用: 各テキストノードの元テキストを保存
-    const garbleChars = '&#@$%!?※△□▽◇★♪♭♯〒〆彁丏丕丱乂亅亊亶仄仆仂仗仞仭仟伀伃伋伎伜伡伣佁佇佉佖佝佞佤佧佪佫佮侊侔侗侘侜侞侲侻侽俅俉俍俑俔俜俠俰俲俳俿倅倆倊倎倐倓倕倗倘倛';
+    // 漢字検定1級の難読漢字（文字化け用）
+    const garbleChars = '鑷靨齏齟齣齧齲齶齷龕龜龝龠纛纜纝纃纈纊纋纎纐纑纒纓纔纕纗纘纙纚纛繆繇繎繐繒繓織繕繖繗繘繙繚繞繟繠繡繢繣繤繥繦繧繨繩繪繫繬繭繮繯繰繱繲繳繴繵繶繷繸繹繺繻繼繽繾繿纀纁纂纃纄纅纆纇纈纉纊纋續纍纎纏纐纑纒纓纔纕纖纗纘纙纚纛鬮鬯鬱鬲鬳鬴鬵鬶鬷鬸鬹鬺鑈鑌鑐鑒鑕鑗鑙鑛鑞鑠鑢鑤鑥鑨鑪鑫鑬鑭鑮鑯鑰鑱鑲鑳鑴鑵鑶鑷鑸鑹鑺鑻鑼鑽鑾鑿钀钁钂钃钄钅钆钇针钉钊钋钌钍钎钏钐钑钒钓钔钕钖钗钘钙钚钛钜钝钞钟钠钡钢钣钤钥钦钧钨钩钪钫钬钭钮钯钰钱钲钳钴钵钶钷钸钹钺钻钼钽钾钿铀铁铂铃铄铅铆铇铈铉铊铋铌铍铎铏铐铑铒铓铔铕铖铗铘铙铚铛';
 
     let garbleInterval = null;
     let garbleOriginals = [];
@@ -1479,12 +1473,10 @@
       const container = document.querySelector('.container');
       const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
       garbleOriginals = [];
-      const nodes = [];
       while (walker.nextNode()) {
         const n = walker.currentNode;
         if (n.textContent.trim()) {
           garbleOriginals.push({ node: n, text: n.textContent });
-          nodes.push(n);
         }
       }
       garbleInterval = setInterval(() => {
@@ -1492,13 +1484,11 @@
           let garbled = '';
           for (let i = 0; i < text.length; i++) {
             if (text[i] === ' ' || text[i] === '\n') { garbled += text[i]; continue; }
-            garbled += Math.random() < 0.4
-              ? garbleChars[Math.floor(Math.random() * garbleChars.length)]
-              : text[i];
+            garbled += garbleChars[Math.floor(Math.random() * garbleChars.length)];
           }
           node.textContent = garbled;
         }
-      }, 100);
+      }, 50);
     }
 
     function stopGarble() {
