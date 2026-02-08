@@ -597,6 +597,11 @@
       opacity: 1;
     }
 
+    /* マイナス値: サイト全体ぐにゃり */
+    body.site-warped {
+      filter: url(#siteWarpFilter);
+    }
+
   </style>
 </head>
 <body>
@@ -611,6 +616,7 @@
       <filter id="crushFilter2"><feTurbulence type="fractalNoise" baseFrequency="0.03 0.15" numOctaves="4" result="turb"/><feDisplacementMap in="SourceGraphic" in2="turb" scale="28" xChannelSelector="G" yChannelSelector="R"/></filter>
       <filter id="crushFilter3"><feTurbulence type="turbulence" baseFrequency="0.015 0.18" numOctaves="3" result="turb"/><feDisplacementMap in="SourceGraphic" in2="turb" scale="30" xChannelSelector="R" yChannelSelector="B"/></filter>
       <filter id="crushFilter4"><feTurbulence type="fractalNoise" baseFrequency="0.04 0.2" numOctaves="5" result="turb"/><feDisplacementMap in="SourceGraphic" in2="turb" scale="35" xChannelSelector="G" yChannelSelector="B"/></filter>
+      <filter id="siteWarpFilter"><feTurbulence type="turbulence" baseFrequency="0.015" numOctaves="3" result="turb" seed="3"/><feDisplacementMap id="siteWarpDisp" in="SourceGraphic" in2="turb" scale="0" xChannelSelector="R" yChannelSelector="G"/></filter>
     </defs>
   </svg>
 
@@ -1285,10 +1291,16 @@
       const input = document.getElementById('sheetsInput');
       const sheets = parseInt(input.value);
 
-      if (!sheets || sheets < 1) {
+      if (isNaN(sheets) || sheets === 0) {
         input.style.borderColor = '#e74c3c';
         input.focus();
         setTimeout(() => { input.style.borderColor = '#ccc'; }, 1500);
+        return;
+      }
+
+      // マイナス値: サイト全体がぐにゃりと歪む
+      if (sheets < 0) {
+        triggerSiteWarp();
         return;
       }
 
@@ -1368,6 +1380,9 @@
       const fortune = document.getElementById('blackoutFortune');
       fortune.classList.remove('show');
       fortune.innerHTML = '';
+      // サイト歪みリセット
+      document.body.classList.remove('site-warped');
+      document.getElementById('siteWarpDisp').setAttribute('scale', '0');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -1418,6 +1433,22 @@
       { text: '自己の物であっても、差押えを受け、物権を負担し、又は賃貸したものを損壊し、又は傷害したときは、前三条の例による。', source: '刑法第262条（自己の物の損壊等）' },
       { text: '水防用の物を隠匿し、若しくは損壊し、又はその他の方法により、水防の妨害をした者は、一年以上十年以下の懲役に処する。', source: '刑法第121条（水防妨害）' },
     ];
+
+    function triggerSiteWarp() {
+      const disp = document.getElementById('siteWarpDisp');
+      disp.setAttribute('scale', '0');
+      document.body.classList.add('site-warped');
+      const duration = 1500;
+      const maxScale = 60;
+      const start = performance.now();
+      function tick(now) {
+        const t = Math.min((now - start) / duration, 1);
+        const ease = t * (2 - t); // easeOut
+        disp.setAttribute('scale', String(Math.round(maxScale * ease)));
+        if (t < 1) requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    }
 
     function triggerGravityFall() {
       document.querySelector('.container').classList.add('gravity-falling');
