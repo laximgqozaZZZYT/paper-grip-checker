@@ -1,0 +1,9 @@
+# Netlify デプロイ設定
+# リポジトリを Netlify に接続し、本番ビルドで dist を配信する
+
+[build]
+  command = "node scripts/build.js"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "18"

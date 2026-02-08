@@ -4,7 +4,7 @@
 
 ## 本番に含めないファイル（デプロイ対象外）
 
-本番環境にアップロードするのは **dist/ 内の4ファイルだけ**です。以下は **一切デプロイされません**。
+本番環境は **Cloudflare Pages** を想定しています。アップロードするのは **dist/ 内のファイル一式**です。以下は **一切デプロイされません**。
 
 | 対象 | 理由 |
 |------|------|
@@ -13,7 +13,7 @@
 | `scripts/` 一式 | ビルド・編集用。dist にコピーされない |
 | `.gitignore` 等 | 配布物に不要 |
 
-**dist/ にコピーされるのは** `index.html`・`fortune.html`・`fortune-data.js`・`animal-data.js` の4つ（build.js の `DEPLOY_FILES` で固定）。
+**dist/ にコピーされるのは** `index.html`・`fortune.html`・`fortune-data.js`・`animal-data.js` の4つ（build.js の `DEPLOY_FILES` で固定）。加えて **robots.txt** と **sitemap.xml** がビルド時に生成され、SEO用に dist に出力される。
 
 ## 1. ビルドの実行
 
@@ -32,21 +32,39 @@ node scripts/build.js
 
 平文 JSON や `scripts/` は **dist に含まれません**。
 
-## 2. デプロイ方法
+## 2. デプロイ方法（Cloudflare Pages）
 
-### パターンA: dist の中身だけをアップロードする
+本番は **Cloudflare Pages** でホスティングします。Git リポジトリを接続した場合の設定例です。
 
-- 手動でサーバーや CDN にアップロードする場合は、**dist/** フォルダの中身だけをアップロードする。
-- ルートに `index.html`, `fortune-data.js`, `animal-data.js` が並ぶようにする。
+| 設定項目 | 値 |
+|----------|-----|
+| **Build command** | `node scripts/build.js` |
+| **Build output directory** | `dist` |
+| **Root directory** | （空のまま） |
+| **Node.js version** | 18 推奨（`.nvmrc` あり） |
 
-### パターンB: Cloudflare Pages など「ビルドコマンド」がある場合
+- リポジトリに push すると Cloudflare がビルドし、`dist` の内容を配信します。
+- 平文 JSON はビルド結果に含まれないため、本番には出ません。
 
-- **Build command:** `node scripts/build.js`  
-  （Node が使える環境である必要があります。未インストールの場合は「ビルドなし」で、あらかじめローカルで作った dist の中身をルートとして push する運用でも可）
-- **Build output directory:** `dist`
-- リポジトリには平文 JSON が含まれていても、ビルド結果の `dist` にはコピーされないため、本番には平文は出ません。
+### 環境変数（任意）
 
-## 3. 注意
+- **BASE_URL** … 本番の絶対URL（例: `https://your-project.pages.dev`）。指定すると `sitemap.xml` と `robots.txt` の URL が絶対パスになります。Cloudflare Pages の「設定 → 環境変数」で追加できます。
+
+### 手動アップロードする場合
+
+- **dist/** の中身だけを Cloudflare Pages の「Direct Upload」や他の CDN にアップロードする運用も可能です。
+
+## 3. オプション: 絶対URL（sitemap / robots.txt）
+
+本番のドメインが決まっている場合、ビルド時に `BASE_URL` を指定すると sitemap.xml と robots.txt の URL が絶対パスになります。
+
+```bash
+BASE_URL=https://yoursite.pages.dev node scripts/build.js
+```
+
+（Cloudflare Pages の「設定 → 環境変数」で `BASE_URL` に本番URLを設定すると、sitemap が正しく参照されます。）
+
+## 4. 注意
 
 - `dist/` は `.gitignore` に入っているため、通常はリポジトリにはコミットしません。
-- 本番に上げるのは **dist 内の4ファイルだけ**にすると、平文 JSON を本番環境に上げずに運用できます。
+- 本番に上げるのは **dist 内のファイル一式**（HTML・JS・robots.txt・sitemap.xml）です。平文 JSON は dist に含まれません。

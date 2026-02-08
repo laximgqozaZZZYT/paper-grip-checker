@@ -3,12 +3,52 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>紙ちぎり握力チェッカー"鑷"</title>
+  <title>握力チェッカー"鑷"｜握力診断・動物比較</title>
+  <meta name="description" content="重ねた紙を何枚ちぎれたかで握力を推定。成人平均との比較や「ぎりぎり負ける動物」で楽しく診断できる無料ツールです。">
+  <meta name="keywords" content="握力,握力チェック,握力診断,握力測定,握力 動物,握力 診断 無料">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#6b4e2a">
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="握力チェッカー 鑷">
+  <meta property="og:title" content="握力チェッカー&quot;鑷&quot;｜握力診断・動物比較">
+  <meta property="og:description" content="重ねた紙を何枚ちぎれたかで握力を推定。成人平均との比較や「ぎりぎり負ける動物」で楽しく診断できる無料ツールです。">
+  <meta property="og:locale" content="ja_JP">
+  <meta property="og:image:alt" content="握力チェッカー 鑷 - 握力診断ツール">
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="握力チェッカー&quot;鑷&quot;｜握力診断・動物比較">
+  <meta name="twitter:description" content="重ねた紙を何枚ちぎれたかで握力を推定。成人平均との比較や「ぎりぎり負ける動物」で楽しく診断できる無料ツールです。">
+  <link rel="canonical" href="index.html">
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Noto+Serif+JP:wght@400;700;900&display=swap" as="style">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Noto+Serif+JP:wght@400;700;900&display=swap" rel="stylesheet">
-  <!-- TODO: ca-pub-XXXXXXXXXXXXXXXX を自分のパブリッシャーIDに置き換える -->
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
+  <!-- Structured Data (JSON-LD) for SEO -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "握力チェッカー 鑷",
+    "description": "重ねた紙を何枚ちぎれたかで握力を推定。成人平均との比較や「ぎりぎり負ける動物」で楽しく診断できる無料ツールです。",
+    "applicationCategory": "Game",
+    "operatingSystem": "Any",
+    "inLanguage": "ja",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "JPY" },
+    "featureList": "握力推定, 動物比較, 成人平均比較, フォーチュンクッキー"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "握力チェッカー 鑷",
+    "description": "紙の枚数で握力を推定する無料診断ツール。動物と比較して楽しめます。",
+    "inLanguage": "ja",
+    "url": "./"
+  }
+  </script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8449006086533180" crossorigin="anonymous"></script>
   <style>
     * {
       margin: 0;
@@ -658,10 +698,11 @@
 
   <div class="container">
     <header class="header">
-      <h1>紙ちぎり握力チェッカー&#8220;鑷&#8221;</h1>
+      <h1>握力チェッカー&#8220;鑷&#8221;</h1>
       <div class="sub">重ねてちぎった紙の枚数から握力を推定します</div>
     </header>
 
+    <main>
     <div class="input-area">
       <label>何枚ちぎった？</label>
       <div class="input-row">
@@ -708,6 +749,7 @@
         <button class="share-btn" onclick="shareResult()">結果をコピー</button>
       </div>
     </div>
+    </main>
 
     <footer class="footer"></footer>
 
@@ -893,13 +935,13 @@
       if (!window._lastResult) return;
       const { sheets, grip, animal } = window._lastResult;
       const text = [
-        '紙ちぎり握力チェッカー"鑷"の結果',
+        '握力チェッカー"鑷"の結果',
         '',
         `ちぎった紙: ${sheets}枚`,
         `推定握力: ${grip}kg`,
         `ぎりぎり負ける動物: ${animal.emoji} ${animal.name}（${animal.grip}kg）`,
         '',
-        '#紙ちぎり握力チェッカー鑷',
+        '#握力チェッカー鑷',
       ].join('\n');
 
       navigator.clipboard.writeText(text).then(() => {
