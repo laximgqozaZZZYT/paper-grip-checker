@@ -15,109 +15,144 @@
 
     body {
       font-family: -apple-system, 'Hiragino Kaku Gothic ProN', 'メイリオ', sans-serif;
-      background: #0f0f0f;
+      background: #0a0a0a;
       color: #e8e0d4;
       min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* 紙吹雪背景 */
+    .confetti-bg {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .confetti-piece {
+      position: absolute;
+      font-size: 1.4rem;
+      opacity: 0.12;
+      clip-path: polygon(8% 0%, 95% 5%, 88% 100%, 3% 92%);
+      animation: confetti-fall linear infinite;
+      will-change: transform;
+    }
+
+    @keyframes confetti-fall {
+      0% { transform: translateY(-5vh) rotate(0deg); }
+      100% { transform: translateY(110vh) rotate(360deg); }
     }
 
     .container {
-      max-width: 520px;
+      position: relative;
+      z-index: 1;
+      max-width: 480px;
       margin: 0 auto;
-      padding: 2rem 1rem;
+      padding: 3rem 1.2rem 2rem;
     }
 
+    /* Header */
     .header {
       text-align: center;
-      margin-bottom: 2rem;
+      margin-bottom: 2.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid rgba(201,169,110,0.15);
     }
 
     .header h1 {
-      font-size: 1.6rem;
+      font-size: 1.5rem;
       font-weight: 900;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.12em;
       color: #c9a96e;
-      margin-bottom: 0.3rem;
+      margin-bottom: 0.5rem;
     }
 
     .header .sub {
-      font-size: 0.85rem;
-      color: #777;
-      letter-spacing: 0.05em;
+      font-size: 0.8rem;
+      color: #666;
+      letter-spacing: 0.08em;
+      font-weight: 300;
     }
 
     /* Input */
     .input-area {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(201,169,110,0.25);
-      border-radius: 12px;
-      padding: 1.5rem;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(201,169,110,0.15);
+      border-radius: 16px;
+      padding: 2rem 1.5rem;
       text-align: center;
-      margin-bottom: 1.5rem;
-      backdrop-filter: blur(8px);
+      margin-bottom: 1.8rem;
     }
 
     .input-area label {
       display: block;
-      font-size: 1rem;
-      font-weight: 700;
-      margin-bottom: 1rem;
-      color: #d4c5a9;
-      letter-spacing: 0.04em;
+      font-size: 0.75rem;
+      font-weight: 500;
+      margin-bottom: 1.2rem;
+      color: #999;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
     }
 
     .input-row {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 0.5rem;
-      margin-bottom: 1.2rem;
+      gap: 0.6rem;
+      margin-bottom: 1.5rem;
     }
 
     .sheets-input {
-      width: 100px;
-      height: 52px;
-      font-size: 1.8rem;
+      width: 120px;
+      height: 56px;
+      font-size: 2rem;
       font-weight: 900;
       text-align: center;
-      border: 1px solid rgba(201,169,110,0.35);
-      border-radius: 8px;
+      border: 1px solid rgba(201,169,110,0.25);
+      border-radius: 12px;
       outline: none;
       font-family: inherit;
-      background: rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.04);
       color: #e8e0d4;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
 
     .sheets-input:focus {
       border-color: #c9a96e;
-      box-shadow: 0 0 0 2px rgba(201,169,110,0.15);
+      box-shadow: 0 0 0 3px rgba(201,169,110,0.1);
     }
 
     .unit {
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: #888;
+      font-size: 1rem;
+      font-weight: 500;
+      color: #666;
+      letter-spacing: 0.05em;
     }
 
     .check-btn {
-      background: linear-gradient(135deg, #c9a96e, #a8893e);
-      color: #1a1a1a;
+      background: linear-gradient(135deg, #c9a96e 0%, #b8944a 100%);
+      color: #0a0a0a;
       border: none;
-      padding: 0.8rem 2rem;
-      border-radius: 8px;
-      font-size: 1.1rem;
-      font-weight: 700;
+      padding: 0.9rem 2.5rem;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 800;
       font-family: inherit;
       cursor: pointer;
-      letter-spacing: 0.05em;
-      transition: opacity 0.2s;
+      letter-spacing: 0.08em;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 4px 20px rgba(201,169,110,0.2);
     }
 
     .check-btn:hover {
-      opacity: 0.88;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 24px rgba(201,169,110,0.3);
     }
 
     .check-btn:active {
-      opacity: 0.75;
+      transform: translateY(0);
+      box-shadow: 0 2px 12px rgba(201,169,110,0.15);
     }
 
     /* Results */
@@ -130,49 +165,51 @@
     }
 
     .result-box {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(201,169,110,0.2);
-      border-radius: 12px;
-      padding: 1.5rem;
-      margin-bottom: 1rem;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(201,169,110,0.12);
+      border-radius: 16px;
+      padding: 2rem 1.5rem;
+      margin-bottom: 1.2rem;
       text-align: center;
-      backdrop-filter: blur(8px);
     }
 
     .result-box .label {
-      font-size: 0.8rem;
-      color: #888;
-      margin-bottom: 0.3rem;
-      letter-spacing: 0.06em;
+      font-size: 0.65rem;
+      color: #666;
+      margin-bottom: 0.6rem;
+      letter-spacing: 0.15em;
       text-transform: uppercase;
+      font-weight: 500;
     }
 
     /* Grip */
     .grip-num {
-      font-size: 3.5rem;
+      font-size: 4rem;
       font-weight: 900;
       color: #c9a96e;
-      line-height: 1.1;
+      line-height: 1;
+      letter-spacing: -0.02em;
     }
 
     .grip-kg {
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: #777;
+      font-size: 1rem;
+      font-weight: 500;
+      color: #666;
+      margin-left: 0.2rem;
     }
 
     .grip-bar-wrap {
-      margin-top: 1rem;
-      background: rgba(255,255,255,0.08);
-      border-radius: 4px;
-      height: 16px;
+      margin-top: 1.2rem;
+      background: rgba(255,255,255,0.06);
+      border-radius: 6px;
+      height: 8px;
       overflow: hidden;
     }
 
     .grip-bar {
       height: 100%;
-      border-radius: 4px;
-      background: linear-gradient(90deg, #a8893e, #c9a96e);
+      border-radius: 6px;
+      background: linear-gradient(90deg, #a8893e, #c9a96e, #dfc07a);
       transition: width 1s ease;
       width: 0%;
     }
@@ -180,9 +217,9 @@
     .grip-bar-labels {
       display: flex;
       justify-content: space-between;
-      font-size: 0.7rem;
-      color: #666;
-      margin-top: 2px;
+      font-size: 0.65rem;
+      color: #555;
+      margin-top: 4px;
     }
 
     /* Animal */
@@ -190,16 +227,16 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 0.8rem;
-      margin: 0.8rem 0;
+      gap: 1.5rem;
+      margin: 1.2rem 0;
     }
 
     .animal-vs .emoji-float {
-      filter: drop-shadow(0 0 12px rgba(201,169,110,0.5)) drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+      filter: drop-shadow(0 0 16px rgba(201,169,110,0.45)) drop-shadow(0 6px 12px rgba(0,0,0,0.6));
     }
 
     .animal-vs .you {
-      font-size: 2.2rem;
+      font-size: 2.8rem;
       position: relative;
       display: inline-block;
     }
@@ -338,90 +375,98 @@
     .you.punch-6 .you-d { clip-path: polygon(50% 50%, 100% 50%, 100% 100%, 50% 100%); transform: perspective(130px) rotateY(15deg) rotateX(15deg); transform-origin: bottom right; }
 
     .animal-vs .vs {
-      font-weight: 900;
-      font-size: 1rem;
-      color: #c9a96e;
-      letter-spacing: 0.1em;
+      font-weight: 300;
+      font-size: 0.75rem;
+      color: #555;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
     }
 
     .animal-vs .them {
-      font-size: 2.2rem;
+      font-size: 2.8rem;
     }
 
     .animal-name {
-      font-size: 1.5rem;
+      font-size: 1.6rem;
       font-weight: 900;
       color: #e8e0d4;
+      letter-spacing: 0.04em;
     }
 
     .animal-grip-tag {
       display: inline-block;
-      background: rgba(201,169,110,0.12);
-      padding: 0.2rem 0.8rem;
-      border-radius: 4px;
-      font-size: 0.8rem;
-      font-weight: 700;
+      background: transparent;
+      padding: 0.25rem 1rem;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 600;
       color: #b89d5c;
-      margin: 0.4rem 0;
-      border: 1px solid rgba(201,169,110,0.2);
+      margin: 0.5rem 0;
+      border: 1px solid rgba(201,169,110,0.25);
+      letter-spacing: 0.06em;
     }
 
-
     .animal-trivia {
-      font-size: 0.8rem;
-      color: #999;
-      margin-top: 0.6rem;
-      padding: 0.5rem 0.8rem;
-      background: rgba(255,255,255,0.03);
-      border-radius: 6px;
+      font-size: 0.78rem;
+      color: #888;
+      margin-top: 1rem;
+      padding: 0.8rem 1rem;
+      background: rgba(201,169,110,0.04);
+      border-radius: 10px;
       text-align: center;
       font-style: italic;
-      line-height: 1.5;
-      border: 1px solid rgba(255,255,255,0.05);
+      line-height: 1.6;
+      border-left: 2px solid rgba(201,169,110,0.3);
     }
 
     .animal-deaths {
-      font-size: 0.75rem;
-      color: #666;
-      margin-top: 0.4rem;
+      font-size: 0.7rem;
+      color: #555;
+      margin-top: 0.5rem;
+      letter-spacing: 0.03em;
     }
 
     /* Actions */
     .actions {
       display: flex;
-      gap: 0.8rem;
+      gap: 1rem;
       justify-content: center;
-      margin-top: 0.5rem;
+      margin-top: 0.8rem;
     }
 
     .retry-btn, .share-btn {
-      padding: 0.6rem 1.2rem;
-      border-radius: 8px;
-      font-size: 0.9rem;
-      font-weight: 700;
+      padding: 0.7rem 1.5rem;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      font-weight: 600;
       font-family: inherit;
       cursor: pointer;
-      transition: opacity 0.2s;
+      transition: transform 0.15s, box-shadow 0.15s;
+      letter-spacing: 0.04em;
     }
 
     .retry-btn {
       background: transparent;
-      border: 1px solid rgba(201,169,110,0.35);
-      color: #c9a96e;
+      border: 1px solid rgba(255,255,255,0.12);
+      color: #999;
     }
 
     .retry-btn:hover {
-      border-color: #c9a96e;
+      border-color: rgba(255,255,255,0.25);
+      color: #ccc;
+      transform: translateY(-1px);
     }
 
     .share-btn {
-      background: rgba(201,169,110,0.15);
-      border: 1px solid rgba(201,169,110,0.3);
+      background: rgba(201,169,110,0.1);
+      border: 1px solid rgba(201,169,110,0.25);
       color: #c9a96e;
     }
 
     .share-btn:hover {
-      background: rgba(201,169,110,0.25);
+      background: rgba(201,169,110,0.18);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(201,169,110,0.1);
     }
 
     .copied-toast {
@@ -430,13 +475,14 @@
       left: 50%;
       transform: translateX(-50%) translateY(100px);
       background: #c9a96e;
-      color: #1a1a1a;
-      padding: 0.6rem 1.2rem;
-      border-radius: 8px;
+      color: #0a0a0a;
+      padding: 0.7rem 1.5rem;
+      border-radius: 12px;
       font-weight: 700;
       font-size: 0.85rem;
       transition: transform 0.3s;
       z-index: 100;
+      letter-spacing: 0.04em;
     }
 
     .copied-toast.show {
@@ -445,9 +491,12 @@
 
     .footer {
       text-align: center;
-      margin-top: 2rem;
-      font-size: 0.75rem;
-      color: #555;
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      font-size: 0.7rem;
+      color: #444;
+      letter-spacing: 0.05em;
     }
 
     .ad-area {
@@ -456,12 +505,15 @@
     }
 
     @media (max-width: 480px) {
-      .header h1 { font-size: 1.3rem; }
-      .grip-num { font-size: 2.8rem; }
+      .container { padding: 2rem 1rem; }
+      .header h1 { font-size: 1.25rem; }
+      .grip-num { font-size: 3.2rem; }
+      .animal-vs .you, .animal-vs .them { font-size: 2.4rem; }
     }
   </style>
 </head>
 <body>
+  <div class="confetti-bg" id="confettiBg"></div>
 
   <div class="container">
     <header class="header">
@@ -532,6 +584,31 @@
   <div class="copied-toast" id="copiedToast">コピーした</div>
 
   <script>
+    // 紙吹雪背景の生成
+    (() => {
+      const emojis = ['🐞','🐌','🐸','🦂','🐹','🐰','🐔','🐧','🐱','🦊','🦦','🐨','🐑','🐗','🦅','🐙','🦘','🐍','🐼','🐆','🦁','🐴','🐅','🐻','🦍','🐘','🦀','🦈','🐊','🦉','🐋','🦛'];
+      const bg = document.getElementById('confettiBg');
+      const count = 30;
+      for (let i = 0; i < count; i++) {
+        const el = document.createElement('span');
+        el.className = 'confetti-piece';
+        el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        el.style.left = (Math.random() * 100) + '%';
+        el.style.fontSize = (0.8 + Math.random() * 1.2) + 'rem';
+        el.style.opacity = 0.06 + Math.random() * 0.08;
+        el.style.animationDuration = (12 + Math.random() * 20) + 's';
+        el.style.animationDelay = -(Math.random() * 30) + 's';
+        const shapes = [
+          'polygon(8% 0%, 95% 5%, 88% 100%, 3% 92%)',
+          'polygon(5% 3%, 92% 0%, 100% 88%, 8% 95%)',
+          'polygon(0% 8%, 88% 0%, 95% 92%, 5% 100%)',
+          'polygon(10% 0%, 100% 10%, 90% 100%, 0% 90%)',
+        ];
+        el.style.clipPath = shapes[Math.floor(Math.random() * shapes.length)];
+        bg.appendChild(el);
+      }
+    })();
+
     const animalTiers = [
       { min: 0, max: 5, animals: [
         { name: 'テントウムシ', emoji: '🐞', grip: 0.5, deaths: 0 },
