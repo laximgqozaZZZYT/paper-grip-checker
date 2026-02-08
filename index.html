@@ -414,6 +414,12 @@
       font-size: 2.8rem;
     }
 
+    /* 虫系アイコンはモザイク（苦手な方配慮） */
+    .animal-vs .them.animal-emoji-mosaic {
+      filter: blur(6px);
+      opacity: 0.92;
+    }
+
     .animal-name {
       font-family: 'Noto Serif JP', serif;
       font-size: 1.6rem;
@@ -806,8 +812,11 @@
       ];
       youEl.className = 'you emoji-float ' + effects[Math.floor(Math.random() * effects.length)];
 
-      // Animal
-      document.getElementById('animalEmoji').textContent = animal.emoji;
+      // Animal（虫系はモザイク表示）
+      const animalEmojiEl = document.getElementById('animalEmoji');
+      const insectEmojis = new Set(['🐛', '🪲', '🐜', '🦗', '🦋']);
+      animalEmojiEl.textContent = animal.emoji;
+      animalEmojiEl.classList.toggle('animal-emoji-mosaic', insectEmojis.has(animal.emoji));
       document.getElementById('animalName').textContent = animal.name;
       document.getElementById('animalGrip').textContent = `握力 ${animal.grip}kg`;
       const quote = quotes[Math.floor(Math.random() * quotes.length)];
