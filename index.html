@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>紙ちぎり握力チェッカー"寿"</title>
+  <title>紙ちぎり握力チェッカー"鑷"</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Noto+Serif+JP:wght@400;700;900&display=swap" rel="stylesheet">
@@ -70,13 +70,6 @@
       letter-spacing: 0.1em;
       color: #6b4e2a;
       margin-bottom: 0.5rem;
-    }
-
-    .header h1 rt {
-      font-size: 0.45em;
-      font-weight: 400;
-      letter-spacing: 0.02em;
-      color: #9e8e78;
     }
 
     .header .sub {
@@ -389,6 +382,24 @@
     .you.punch-6 .you-c { clip-path: polygon(0 50%, 50% 50%, 50% 100%, 0 100%); transform: perspective(130px) rotateY(-15deg) rotateX(15deg); transform-origin: bottom left; }
     .you.punch-6 .you-d { clip-path: polygon(50% 50%, 100% 50%, 100% 100%, 50% 100%); transform: perspective(130px) rotateY(15deg) rotateX(15deg); transform-origin: bottom right; }
 
+    /* ぐにゃあ (warp) — SVG filter で波状歪み */
+    .you.warp-1 { filter: url(#warpFilter1); }
+    .you.warp-2 { filter: url(#warpFilter2); }
+    .you.warp-3 { filter: url(#warpFilter3); }
+    .you.warp-4 { filter: url(#warpFilter4); }
+
+    /* ぐちゃっ (crush) — scaleX 潰し + SVG波状フィルタで紐くにゃくにゃ */
+    .you.crush-1 .you-l, .you.crush-1 .you-r, .you.crush-1 .you-c, .you.crush-1 .you-d,
+    .you.crush-2 .you-l, .you.crush-2 .you-r, .you.crush-2 .you-c, .you.crush-2 .you-d,
+    .you.crush-3 .you-l, .you.crush-3 .you-r, .you.crush-3 .you-c, .you.crush-3 .you-d,
+    .you.crush-4 .you-l, .you.crush-4 .you-r, .you.crush-4 .you-c, .you.crush-4 .you-d {
+      display: inline; clip-path: none;
+    }
+    .you.crush-1 { transform: scaleX(0.25) scaleY(1.2); filter: url(#crushFilter1); }
+    .you.crush-2 { transform: scaleX(0.3) skewY(12deg); filter: url(#crushFilter2); }
+    .you.crush-3 { transform: scaleX(0.12) scaleY(1.4); filter: url(#crushFilter3); }
+    .you.crush-4 { transform: scaleX(0.2) rotate(6deg) skewY(-8deg); filter: url(#crushFilter4); }
+
     .animal-vs .vs {
       font-family: 'Cormorant Garamond', serif;
       font-weight: 400;
@@ -528,14 +539,86 @@
       .grip-num { font-size: 3.4rem; }
       .animal-vs .you, .animal-vs .them { font-size: 2.4rem; }
     }
+    /* Gravity fall animation */
+    @keyframes gravity-fall {
+      0% { transform: translateY(0); opacity: 1; }
+      60% { opacity: 1; }
+      100% { transform: translateY(120vh); opacity: 0; }
+    }
+
+    .gravity-falling .header { animation: gravity-fall 1.2s cubic-bezier(0.55, 0, 1, 0.45) forwards; animation-delay: 0s; }
+    .gravity-falling .input-area { animation: gravity-fall 1.2s cubic-bezier(0.55, 0, 1, 0.45) forwards; animation-delay: 0.08s; }
+    /* results内の子要素を個別に落下（animalTrivia以外） */
+    .gravity-falling .results .result-box { animation: gravity-fall 1.2s cubic-bezier(0.55, 0, 1, 0.45) forwards; animation-delay: 0.16s; }
+    .gravity-falling .results .actions { animation: gravity-fall 1.2s cubic-bezier(0.55, 0, 1, 0.45) forwards; animation-delay: 0.20s; }
+    .gravity-falling .footer { animation: gravity-fall 1.2s cubic-bezier(0.55, 0, 1, 0.45) forwards; animation-delay: 0.24s; }
+    .gravity-falling .ad-area { animation: gravity-fall 1.2s cubic-bezier(0.55, 0, 1, 0.45) forwards; animation-delay: 0.32s; }
+
+    /* 暗転後のフォーチュンクッキー（損壊条文） */
+    #blackoutFortune {
+      display: none;
+      position: fixed;
+      bottom: 8vh;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10001;
+      color: #fff;
+      font-size: 0.95rem;
+      font-style: italic;
+      line-height: 2;
+      text-align: center;
+      max-width: 80vw;
+      opacity: 0;
+      transition: opacity 1.2s ease;
+    }
+    #blackoutFortune.show {
+      display: block;
+      opacity: 1;
+    }
+
+    .confetti-bg.gravity-falling .confetti-piece {
+      animation: gravity-fall 1.0s cubic-bezier(0.55, 0, 1, 0.45) forwards !important;
+    }
+
+    /* 暗転オーバーレイ */
+    .blackout-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      background: #000;
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+    .blackout-overlay.active {
+      display: block;
+    }
+    .blackout-overlay.fade-in {
+      opacity: 1;
+    }
+
   </style>
 </head>
 <body>
+  <!-- SVG filters for warp effects -->
+  <svg style="position:absolute;width:0;height:0;">
+    <defs>
+      <filter id="warpFilter1"><feTurbulence type="turbulence" baseFrequency="0.04" numOctaves="2" result="turb"/><feDisplacementMap in="SourceGraphic" in2="turb" scale="18" xChannelSelector="R" yChannelSelector="G"/></filter>
+      <filter id="warpFilter2"><feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="3" result="turb"/><feDisplacementMap in="SourceGraphic" in2="turb" scale="25" xChannelSelector="R" yChannelSelector="B"/></filter>
+      <filter id="warpFilter3"><feTurbulence type="turbulence" baseFrequency="0.03 0.08" numOctaves="2" result="turb"/><feDisplacementMap in="SourceGraphic" in2="turb" scale="20" xChannelSelector="G" yChannelSelector="R"/></filter>
+      <filter id="warpFilter4"><feTurbulence type="turbulence" baseFrequency="0.08" numOctaves="4" result="turb"/><feDisplacementMap in="SourceGraphic" in2="turb" scale="35" xChannelSelector="R" yChannelSelector="G"/></filter>
+      <filter id="crushFilter1"><feTurbulence type="turbulence" baseFrequency="0.02 0.12" numOctaves="3" result="turb"/><feDisplacementMap in="SourceGraphic" in2="turb" scale="22" xChannelSelector="R" yChannelSelector="G"/></filter>
+      <filter id="crushFilter2"><feTurbulence type="fractalNoise" baseFrequency="0.03 0.15" numOctaves="4" result="turb"/><feDisplacementMap in="SourceGraphic" in2="turb" scale="28" xChannelSelector="G" yChannelSelector="R"/></filter>
+      <filter id="crushFilter3"><feTurbulence type="turbulence" baseFrequency="0.015 0.18" numOctaves="3" result="turb"/><feDisplacementMap in="SourceGraphic" in2="turb" scale="30" xChannelSelector="R" yChannelSelector="B"/></filter>
+      <filter id="crushFilter4"><feTurbulence type="fractalNoise" baseFrequency="0.04 0.2" numOctaves="5" result="turb"/><feDisplacementMap in="SourceGraphic" in2="turb" scale="35" xChannelSelector="G" yChannelSelector="B"/></filter>
+    </defs>
+  </svg>
+
   <div class="confetti-bg" id="confettiBg"></div>
 
   <div class="container">
     <header class="header">
-      <h1>紙ちぎり握力チェッカー&#8220;<ruby>寿<rp>(</rp><rt>グラヴィティ</rt><rp>)</rp></ruby>&#8221;</h1>
+      <h1>紙ちぎり握力チェッカー&#8220;<ruby>鑷<rp>(</rp><rt>鑷</rt><rp>)</rp></ruby>&#8221;</h1>
       <div class="sub">紙をちぎった枚数から握力を推定します</div>
     </header>
 
@@ -600,6 +683,9 @@
   </div>
 
   <div class="copied-toast" id="copiedToast">コピーした</div>
+  <div class="blackout-overlay" id="blackoutOverlay"></div>
+  <div id="blackoutFortune"></div>
+
 
   <script>
     // 紙吹雪背景の生成
@@ -633,109 +719,142 @@
 
     const animalTiers = [
       { min: 0, max: 5, animals: [
-        { name: 'テントウムシ', emoji: '🐞', grip: 0.5, deaths: 0 },
-        { name: 'カタツムリ', emoji: '🐌', grip: 0.5, deaths: 0 },
-        { name: 'ニホンアマガエル', emoji: '🐸', grip: 1, deaths: 0 },
-        { name: 'タランチュラ', emoji: '🕷️', grip: 1, deaths: 0 },
-        { name: 'サソリ', emoji: '🦂', grip: 1.5, deaths: 2600 },
-        { name: 'ニホンヤモリ', emoji: '🦎', grip: 2, deaths: 0 },
-        { name: 'カブトムシ', emoji: '🪲', grip: 2, deaths: 0 },
-        { name: 'サワガニ', emoji: '🦀', grip: 2, deaths: 0 },
-        { name: 'ハリネズミ', emoji: '🦔', grip: 2, deaths: 0 },
-        { name: 'モモンガ', emoji: '🐿️', grip: 2, deaths: 0 },
-        { name: 'ゴールデンハムスター', emoji: '🐹', grip: 3, deaths: 0 },
-        { name: 'アメリカザリガニ', emoji: '🦞', grip: 3, deaths: 0 },
-        { name: 'フェネック', emoji: '🦊', grip: 3, deaths: 0 },
-        { name: 'ニホンリス', emoji: '🐿️', grip: 4, deaths: 0 },
-        { name: 'クサガメ', emoji: '🐢', grip: 5, deaths: 0 },
+        { name: 'ヨーロッパモリアオガエル', emoji: '🐸', grip: 0.5, deaths: 0 },
+        { name: 'オキナワキノボリトカゲ', emoji: '🦎', grip: 0.5, deaths: 0 },
+        { name: 'チャイロコメノゴミムシダマシ', emoji: '🪲', grip: 1, deaths: 0 },
+        { name: 'ヒメマルカツオブシムシ', emoji: '🐛', grip: 1, deaths: 0 },
+        { name: 'ダイオウヒラタクワガタ', emoji: '🪲', grip: 1.5, deaths: 0 },
+        { name: 'トビイロケアリ', emoji: '🐜', grip: 1, deaths: 0 },
+        { name: 'ニホンアカガエル', emoji: '🐸', grip: 2, deaths: 0 },
+        { name: 'ヒガシニホントカゲ', emoji: '🦎', grip: 2, deaths: 0 },
+        { name: 'アフリカヤマネ', emoji: '🐭', grip: 2, deaths: 0 },
+        { name: 'ヨツユビハリネズミ', emoji: '🦔', grip: 2, deaths: 0 },
+        { name: 'ロボロフスキーハムスター', emoji: '🐹', grip: 2, deaths: 0 },
+        { name: 'タイワンリス', emoji: '🐿️', grip: 3, deaths: 0 },
+        { name: 'アカハライモリ', emoji: '🦎', grip: 3, deaths: 0 },
+        { name: 'コモンマーモセット', emoji: '🐒', grip: 4, deaths: 0 },
+        { name: 'ニシアフリカトカゲモドキ', emoji: '🦎', grip: 5, deaths: 0 },
+        { name: '幼児（3〜5歳）', emoji: '👶', grip: 5, deaths: 0 },
       ]},
       { min: 5, max: 15, animals: [
-        { name: 'ニホンノウサギ', emoji: '🐰', grip: 6, deaths: 0 },
-        { name: 'オオコウモリ', emoji: '🦇', grip: 6, deaths: 0 },
-        { name: 'カメレオン', emoji: '🦎', grip: 6, deaths: 0 },
-        { name: 'ミーアキャット', emoji: '🦡', grip: 7, deaths: 0 },
-        { name: 'ニワトリ', emoji: '🐔', grip: 7, deaths: 0 },
-        { name: 'コウテイペンギン', emoji: '🐧', grip: 7, deaths: 0 },
-        { name: 'イエネコ', emoji: '🐱', grip: 8, deaths: 0 },
-        { name: 'ズワイガニ', emoji: '🦀', grip: 8, deaths: 0 },
-        { name: 'プレーリードッグ', emoji: '🐿️', grip: 8, deaths: 0 },
-        { name: 'ホンドタヌキ', emoji: '🦝', grip: 9, deaths: 0 },
-        { name: 'コツメカワウソ', emoji: '🦦', grip: 10, deaths: 0 },
-        { name: 'アライグマ', emoji: '🦝', grip: 10, deaths: 0 },
-        { name: 'アルマジロ', emoji: '🦔', grip: 10, deaths: 0 },
-        { name: 'グリーンイグアナ', emoji: '🦎', grip: 12, deaths: 0 },
-        { name: 'ミツユビナマケモノ', emoji: '🦥', grip: 12, deaths: 0 },
-        { name: 'マングース', emoji: '🦦', grip: 12, deaths: 0 },
+        { name: 'パタゴニアマーラ', emoji: '🐰', grip: 6, deaths: 0 },
+        { name: 'デマレルーセットオオコウモリ', emoji: '🦇', grip: 6, deaths: 0 },
+        { name: 'エボシカメレオン', emoji: '🦎', grip: 6, deaths: 0 },
+        { name: 'ケープハイラックス', emoji: '🐿️', grip: 7, deaths: 0 },
+        { name: 'セキショクヤケイ', emoji: '🐔', grip: 7, deaths: 0 },
+        { name: 'アデリーペンギン', emoji: '🐧', grip: 7, deaths: 0 },
+        { name: 'スナドリネコ', emoji: '🐱', grip: 8, deaths: 0 },
+        { name: 'タカアシガニ', emoji: '🦀', grip: 8, deaths: 0 },
+        { name: 'オグロプレーリードッグ', emoji: '🐿️', grip: 8, deaths: 0 },
+        { name: 'エゾタヌキ', emoji: '🦝', grip: 9, deaths: 0 },
+        { name: '小学低学年（6〜8歳）', emoji: '🧒', grip: 10, deaths: 0 },
+        { name: 'ビロードカワウソ', emoji: '🦦', grip: 10, deaths: 0 },
+        { name: 'カニクイアライグマ', emoji: '🦝', grip: 10, deaths: 0 },
+        { name: 'ムツオビアルマジロ', emoji: '🦔', grip: 10, deaths: 0 },
+        { name: 'サバンナモニター', emoji: '🦎', grip: 12, deaths: 0 },
+        { name: 'フタユビナマケモノ', emoji: '🦥', grip: 12, deaths: 0 },
+        { name: 'コモンジェネット', emoji: '🦦', grip: 12, deaths: 0 },
         { name: 'ホンドギツネ', emoji: '🦊', grip: 14, deaths: 0 },
-        { name: 'ラッコ', emoji: '🦦', grip: 14, deaths: 0 },
+        { name: 'カリフォルニアラッコ', emoji: '🦦', grip: 14, deaths: 0 },
       ]},
       { min: 15, max: 35, animals: [
-        { name: 'タラバガニ', emoji: '🦀', grip: 18, deaths: 0 },
-        { name: 'コアラ', emoji: '🐨', grip: 18, deaths: 0 },
-        { name: 'カピバラ', emoji: '🦫', grip: 20, deaths: 0 },
-        { name: 'ヒツジ', emoji: '🐑', grip: 20, deaths: 0 },
-        { name: '柴犬', emoji: '🐕', grip: 22, deaths: 0 },
-        { name: 'ウォンバット', emoji: '🐻', grip: 22, deaths: 0 },
+        { name: 'ハナサキガニ', emoji: '🦀', grip: 18, deaths: 0 },
+        { name: 'クイーンズランドコアラ', emoji: '🐨', grip: 18, deaths: 0 },
+        { name: '小学高学年（10〜12歳）', emoji: '👦', grip: 20, deaths: 0 },
+        { name: 'パンパステンジクネズミ', emoji: '🦫', grip: 20, deaths: 0 },
+        { name: 'マンクスロフタンヒツジ', emoji: '🐑', grip: 20, deaths: 0 },
+        { name: 'グレータークードゥー', emoji: '🦌', grip: 22, deaths: 0 },
+        { name: 'キタケバナウォンバット', emoji: '🐻', grip: 22, deaths: 0 },
         { name: 'アメリカンロブスター', emoji: '🦞', grip: 25, deaths: 0 },
-        { name: 'アメリカビーバー', emoji: '🦫', grip: 25, deaths: 1 },
-        { name: 'ラーテル', emoji: '🦡', grip: 25, deaths: 0 },
-        { name: 'ボブキャット', emoji: '🐱', grip: 25, deaths: 0 },
-        { name: 'ヤギ', emoji: '🐐', grip: 27, deaths: 0 },
-        { name: 'ニホンイノシシ', emoji: '🐗', grip: 28, deaths: 10 },
-        { name: 'オオタカ', emoji: '🦅', grip: 30, deaths: 0 },
+        { name: 'カナダヤマアラシ', emoji: '🦔', grip: 25, deaths: 0 },
+        { name: 'ミナミコアリクイ', emoji: '🐾', grip: 25, deaths: 0 },
+        { name: 'パンパスネコ', emoji: '🐱', grip: 25, deaths: 0 },
+        { name: 'マーコール', emoji: '🐐', grip: 27, deaths: 0 },
+        { name: '80代以上', emoji: '👴', grip: 28, deaths: 0 },
+        { name: 'ニホンカモシカ', emoji: '🐐', grip: 28, deaths: 0 },
+        { name: '中学生（13〜15歳）', emoji: '🧑‍🎓', grip: 30, deaths: 0 },
+        { name: 'カンムリクマタカ', emoji: '🦅', grip: 30, deaths: 0 },
         { name: 'コモドオオトカゲ', emoji: '🦎', grip: 30, deaths: 5 },
-        { name: 'ワシミミズク', emoji: '🦉', grip: 30, deaths: 0 },
-        { name: 'マダコ', emoji: '🐙', grip: 32, deaths: 1 },
+        { name: 'シロフクロウ', emoji: '🦉', grip: 30, deaths: 0 },
+        { name: 'ミズダコ', emoji: '🐙', grip: 32, deaths: 0 },
       ]},
       { min: 35, max: 60, animals: [
-        { name: 'アルパカ', emoji: '🦙', grip: 38, deaths: 0 },
-        { name: 'コヨーテ', emoji: '🐺', grip: 38, deaths: 1 },
-        { name: 'ハイイロオオカミ', emoji: '🐺', grip: 40, deaths: 10 },
-        { name: 'チーター', emoji: '🐆', grip: 42, deaths: 0 },
-        { name: 'ニホンジカ', emoji: '🦌', grip: 42, deaths: 5 },
+        { name: '70代', emoji: '👴', grip: 35, deaths: 0 },
+        { name: 'グアナコ', emoji: '🦙', grip: 38, deaths: 0 },
+        { name: 'アビシニアジャッカル', emoji: '🐺', grip: 38, deaths: 0 },
+        { name: '60代', emoji: '🧓', grip: 40, deaths: 0 },
+        { name: '高校生（16〜18歳）', emoji: '💪', grip: 40, deaths: 0 },
+        { name: 'エチオピアオオカミ', emoji: '🐺', grip: 40, deaths: 0 },
+        { name: '那須川天心（格闘家）', emoji: '🥊', grip: 42, deaths: 0 },
+        { name: 'キングチーター', emoji: '🐆', grip: 42, deaths: 0 },
+        { name: 'エゾシカ', emoji: '🦌', grip: 42, deaths: 5 },
+        { name: '50代', emoji: '👨', grip: 44, deaths: 0 },
         { name: 'アカカンガルー', emoji: '🦘', grip: 45, deaths: 2 },
-        { name: 'ダチョウ', emoji: '🦢', grip: 45, deaths: 0 },
-        { name: 'ビルマニシキヘビ', emoji: '🐍', grip: 48, deaths: 5 },
-        { name: 'ジャイアントパンダ', emoji: '🐼', grip: 50, deaths: 0 },
-        { name: 'ブチハイエナ', emoji: '🐺', grip: 50, deaths: 2 },
+        { name: 'ソマリアダチョウ', emoji: '🦢', grip: 45, deaths: 0 },
+        { name: '40代', emoji: '👨', grip: 46, deaths: 0 },
+        { name: '成人男性20代', emoji: '🧑', grip: 47, deaths: 0 },
+        { name: '成人男性30代', emoji: '👨', grip: 47, deaths: 0 },
+        { name: 'インドニシキヘビ', emoji: '🐍', grip: 48, deaths: 5 },
+        { name: 'シンリンオオカミ', emoji: '🐺', grip: 50, deaths: 0 },
+        { name: 'キンイロジャッカル', emoji: '🐺', grip: 50, deaths: 0 },
         { name: 'ヒトコブラクダ', emoji: '🐪', grip: 52, deaths: 20 },
-        { name: 'ヒョウ', emoji: '🐆', grip: 55, deaths: 50 },
-        { name: 'ヌー', emoji: '🐃', grip: 55, deaths: 0 },
+        { name: 'アムールヒョウ', emoji: '🐆', grip: 55, deaths: 0 },
+        { name: 'オグロヌー', emoji: '🐃', grip: 55, deaths: 0 },
       ]},
       { min: 60, max: 120, animals: [
         { name: 'ヒクイドリ', emoji: '🦚', grip: 65, deaths: 2 },
-        { name: 'ナイルワニ', emoji: '🐊', grip: 70, deaths: 1000 },
-        { name: 'ホルスタイン', emoji: '🐮', grip: 75, deaths: 20 },
+        { name: 'ガビアルモドキ', emoji: '🐊', grip: 70, deaths: 0 },
+        { name: '朝青龍（横綱）', emoji: '🏋️', grip: 75, deaths: 0 },
+        { name: 'スコティッシュハイランドキャトル', emoji: '🐮', grip: 75, deaths: 0 },
         { name: 'モンハナシャコ', emoji: '🦐', grip: 80, deaths: 0 },
-        { name: 'ライオン', emoji: '🦁', grip: 80, deaths: 200 },
-        { name: 'サラブレッド', emoji: '🐴', grip: 85, deaths: 100 },
+        { name: 'バーバリライオン', emoji: '🦁', grip: 80, deaths: 0 },
+        { name: 'アハルテケ', emoji: '🐴', grip: 85, deaths: 0 },
+        { name: '新庄剛志（プロ野球）', emoji: '⚾', grip: 90, deaths: 0 },
         { name: 'ゼニガタアザラシ', emoji: '🦭', grip: 90, deaths: 0 },
-        { name: 'セイウチ', emoji: '🦭', grip: 90, deaths: 0 },
-        { name: 'ジャガー', emoji: '🐆', grip: 95, deaths: 0 },
-        { name: 'ベンガルトラ', emoji: '🐅', grip: 100, deaths: 50 },
-        { name: 'イリエワニ', emoji: '🐊', grip: 110, deaths: 1000 },
-        { name: 'ホホジロザメ', emoji: '🦈', grip: 110, deaths: 10 },
+        { name: 'ミナミゾウアザラシ', emoji: '🦭', grip: 90, deaths: 0 },
+        { name: '千代の富士（横綱）', emoji: '🏋️', grip: 92, deaths: 0 },
+        { name: 'メラネシスティックジャガー', emoji: '🐆', grip: 95, deaths: 0 },
+        { name: 'ボブ・サップ（格闘家）', emoji: '🥊', grip: 98, deaths: 0 },
+        { name: 'アムールトラ', emoji: '🐅', grip: 100, deaths: 0 },
+        { name: '魁皇（大関）', emoji: '🏋️', grip: 110, deaths: 0 },
+        { name: 'フィリピンワニ', emoji: '🐊', grip: 110, deaths: 0 },
+        { name: 'ヨシキリザメ', emoji: '🦈', grip: 110, deaths: 0 },
       ]},
       { min: 120, max: 250, animals: [
-        { name: 'ツキノワグマ', emoji: '🐻', grip: 130, deaths: 5 },
-        { name: 'ヒグマ', emoji: '🐻', grip: 150, deaths: 10 },
+        { name: '室伏広治（ハンマー投げ）', emoji: '🏅', grip: 120, deaths: 0 },
+        { name: 'リチャード・ソリン（CoC No.3初クローザー）', emoji: '✊', grip: 127, deaths: 0 },
+        { name: 'ジョン・ブルックフィールド（グリップパイオニア）', emoji: '✊', grip: 127, deaths: 0 },
+        { name: 'レイン・スヌーク（英グリップ選手）', emoji: '✊', grip: 127, deaths: 0 },
+        { name: 'アンドルス・ムルメッツ（エストニア怪力）', emoji: '✊', grip: 127, deaths: 0 },
+        { name: '大山倍達（極真空手）', emoji: '🥋', grip: 130, deaths: 0 },
+        { name: 'ニホンツキノワグマ', emoji: '🐻', grip: 130, deaths: 5 },
+        { name: 'マーク・フェリックス（英ストロングマン）', emoji: '✊', grip: 137, deaths: 0 },
+        { name: 'タナー・マークル（米グリップ王者）', emoji: '✊', grip: 146, deaths: 0 },
+        { name: 'デビッド・ホーン（世界最強の手の創設者）', emoji: '✊', grip: 147, deaths: 0 },
+        { name: 'コディアックヒグマ', emoji: '🐻', grip: 150, deaths: 0 },
         { name: 'アミメニシキヘビ', emoji: '🐍', grip: 150, deaths: 5 },
-        { name: 'アメリカバイソン', emoji: '🦬', grip: 160, deaths: 3 },
-        { name: 'クロサイ', emoji: '🦏', grip: 180, deaths: 2 },
-        { name: 'シャチ', emoji: '🐬', grip: 190, deaths: 0 },
+        { name: 'ヨーロッパバイソン', emoji: '🦬', grip: 160, deaths: 0 },
+        { name: 'ジョー・キニー（CoC No.4世界初クローザー）', emoji: '✊', grip: 166, deaths: 0 },
+        { name: 'ネイサン・ホール（CoC No.4クローザー）', emoji: '✊', grip: 166, deaths: 0 },
+        { name: 'デビッド・モートン（CoC No.4クローザー）', emoji: '✊', grip: 166, deaths: 0 },
+        { name: 'トミー・ヘスレップ（CoC No.4クローザー）', emoji: '✊', grip: 166, deaths: 0 },
+        { name: 'マグナス・サミュエルソン（瑞ストロングマン）', emoji: '✊', grip: 166, deaths: 0 },
+        { name: 'カール・マイアースコー（CoC No.4最新クローザー）', emoji: '✊', grip: 166, deaths: 0 },
+        { name: 'インドサイ', emoji: '🦏', grip: 180, deaths: 2 },
+        { name: 'トランスバールシャチ', emoji: '🐬', grip: 190, deaths: 0 },
         { name: 'ボルネオオランウータン', emoji: '🦧', grip: 200, deaths: 0 },
-        { name: 'マサイキリン', emoji: '🦒', grip: 210, deaths: 2 },
-        { name: 'アフリカスイギュウ', emoji: '🐃', grip: 220, deaths: 200 },
-        { name: 'カバ', emoji: '🦛', grip: 230, deaths: 500 },
+        { name: 'アミメキリン', emoji: '🦒', grip: 210, deaths: 0 },
+        { name: 'ケープバッファロー', emoji: '🐃', grip: 220, deaths: 200 },
+        { name: 'コビトカバ', emoji: '🦛', grip: 230, deaths: 0 },
       ]},
       { min: 250, max: 9999, animals: [
-        { name: 'チンパンジー', emoji: '🐒', grip: 270, deaths: 2 },
-        { name: 'テナガザル', emoji: '🐒', grip: 300, deaths: 0 },
+        { name: 'ボノボ', emoji: '🐒', grip: 270, deaths: 0 },
+        { name: 'シロテテナガザル', emoji: '🐒', grip: 300, deaths: 0 },
         { name: 'ヤシガニ', emoji: '🦀', grip: 330, deaths: 0 },
         { name: 'ホッキョクグマ', emoji: '🐻‍❄️', grip: 350, deaths: 1 },
-        { name: 'マウンテンゴリラ', emoji: '🦍', grip: 500, deaths: 0 },
+        { name: 'ヒガシローランドゴリラ', emoji: '🦍', grip: 500, deaths: 0 },
         { name: 'マッコウクジラ', emoji: '🐋', grip: 600, deaths: 0 },
-        { name: 'アフリカゾウ', emoji: '🐘', grip: 700, deaths: 500 },
+        { name: 'サバンナアフリカゾウ', emoji: '🐘', grip: 700, deaths: 500 },
         { name: 'シロナガスクジラ', emoji: '🐋', grip: 900, deaths: 0 },
       ]},
     ];
@@ -1191,6 +1310,8 @@
         'split-1','split-2','split-3','split-4','split-5','split-6','split-7','split-8',
         'torn-1','torn-2','torn-3','torn-4','torn-5','torn-6',
         'punch-1','punch-2','punch-3','punch-4','punch-5','punch-6',
+        'warp-1','warp-2','warp-3','warp-4',
+        'crush-1','crush-2','crush-3','crush-4',
       ];
       youEl.className = 'you emoji-float ' + effects[Math.floor(Math.random() * effects.length)];
 
@@ -1215,6 +1336,11 @@
       }, 100);
 
       window._lastResult = { sheets, grip, animal };
+
+      // Gravity fall trigger for humanFallback (grip >= 700)
+      if (animal === humanFallback) {
+        setTimeout(() => triggerGravityFall(), 900);
+      }
     }
 
     function animateNumber(el, from, to, duration) {
@@ -1234,6 +1360,14 @@
       document.getElementById('gripBar').style.width = '0%';
       document.getElementById('sheetsInput').value = '';
       document.getElementById('sheetsInput').focus();
+      // gravity-fall / blackout状態のリセット
+      document.querySelector('.container').classList.remove('gravity-falling');
+      document.getElementById('confettiBg').classList.remove('gravity-falling');
+      const overlay = document.getElementById('blackoutOverlay');
+      overlay.classList.remove('fade-in', 'active');
+      const fortune = document.getElementById('blackoutFortune');
+      fortune.classList.remove('show');
+      fortune.innerHTML = '';
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -1241,13 +1375,13 @@
       if (!window._lastResult) return;
       const { sheets, grip, animal } = window._lastResult;
       const text = [
-        '紙ちぎり握力チェッカー"寿(グラヴィティ)"の結果',
+        '紙ちぎり握力チェッカー"鑷"の結果',
         '',
         `ちぎった紙: ${sheets}枚`,
         `推定握力: ${grip}kg`,
         `ぎりぎり負ける動物: ${animal.emoji} ${animal.name}（${animal.grip}kg）`,
         '',
-        '#紙ちぎり握力チェッカー寿',
+        '#紙ちぎり握力チェッカー鑷',
       ].join('\n');
 
       navigator.clipboard.writeText(text).then(() => {
@@ -1267,6 +1401,42 @@
       const t = document.getElementById('copiedToast');
       t.classList.add('show');
       setTimeout(() => t.classList.remove('show'), 2000);
+    }
+
+    // 損壊に関わる条文（暗転後に表示）
+    const destructionLaws = [
+      { text: '他人の建造物又は艦船を損壊した者は、五年以下の懲役に処する。', source: '刑法第260条（建造物等損壊）' },
+      { text: '前三条に規定するもののほか、他人の物を損壊し、又は傷害した者は、三年以下の懲役又は三十万円以下の罰金若しくは科料に処する。', source: '刑法第261条（器物損壊等）' },
+      { text: '故意又は過失によって他人の権利又は法律上保護される利益を侵害した者は、これによって生じた損害を賠償する責任を負う。', source: '民法第709条（不法行為による損害賠償）' },
+      { text: '他人の身体、自由若しくは名誉を侵害した場合又は他人の財産権を侵害した場合のいずれであるかを問わず、前条の規定により損害賠償の責任を負う者は、財産以外の損害に対しても、その賠償をしなければならない。', source: '民法第710条（財産以外の損害の賠償）' },
+      { text: '放火して、現に人が住居に使用し又は現に人がいる建造物、汽車、電車、艦船又は鉱坑を焼損した者は、死刑又は無期若しくは五年以上の懲役に処する。', source: '刑法第108条（現住建造物等放火）' },
+      { text: '公務所の用に供する文書又は電磁的記録を毀棄した者は、三月以上七年以下の懲役に処する。', source: '刑法第258条（公用文書等毀棄）' },
+      { text: '権利又は義務に関する他人の文書又は電磁的記録を毀棄した者は、五年以下の懲役に処する。', source: '刑法第259条（私用文書等毀棄）' },
+      { text: '土地の工作物の設置又は保存に瑕疵があることによって他人に損害を生じたときは、その工作物の占有者は、被害者に対してその損害を賠償する責任を負う。', source: '民法第717条（土地の工作物等の占有者及び所有者の責任）' },
+      { text: '他人の信書を隠匿した者は、六月以下の懲役若しくは禁錮又は十万円以下の罰金若しくは科料に処する。', source: '刑法第263条（信書隠匿）' },
+      { text: '境界標を損壊し、移動し、若しくは除去し、又はその他の方法により、土地の境界を認識することができないようにした者は、五年以下の懲役又は五十万円以下の罰金に処する。', source: '刑法第262条の2（境界損壊）' },
+      { text: '自己の物であっても、差押えを受け、物権を負担し、又は賃貸したものを損壊し、又は傷害したときは、前三条の例による。', source: '刑法第262条（自己の物の損壊等）' },
+      { text: '水防用の物を隠匿し、若しくは損壊し、又はその他の方法により、水防の妨害をした者は、一年以上十年以下の懲役に処する。', source: '刑法第121条（水防妨害）' },
+    ];
+
+    function triggerGravityFall() {
+      document.querySelector('.container').classList.add('gravity-falling');
+      document.getElementById('confettiBg').classList.add('gravity-falling');
+      // 暗転オーバーレイを表示
+      const overlay = document.getElementById('blackoutOverlay');
+      overlay.classList.add('active');
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          overlay.classList.add('fade-in');
+        });
+      });
+      // 暗転完了後に損壊条文を表示
+      setTimeout(() => {
+        const law = destructionLaws[Math.floor(Math.random() * destructionLaws.length)];
+        const fortuneEl = document.getElementById('blackoutFortune');
+        fortuneEl.innerHTML = `${law.text}<br><br>──${law.source}`;
+        fortuneEl.classList.add('show');
+      }, 1800);
     }
 
     document.getElementById('sheetsInput').addEventListener('keydown', (e) => {
