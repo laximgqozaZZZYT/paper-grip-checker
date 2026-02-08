@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>紙ちぎり握力チェッカー</title>
+  <title>紙ちぎり握力チェッカー"寿"</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Noto+Serif+JP:wght@400;700;900&display=swap" rel="stylesheet">
@@ -70,6 +70,13 @@
       letter-spacing: 0.1em;
       color: #6b4e2a;
       margin-bottom: 0.5rem;
+    }
+
+    .header h1 rt {
+      font-size: 0.45em;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      color: #9e8e78;
     }
 
     .header .sub {
@@ -528,7 +535,7 @@
 
   <div class="container">
     <header class="header">
-      <h1>紙ちぎり握力チェッカー</h1>
+      <h1>紙ちぎり握力チェッカー&#8220;<ruby>寿<rp>(</rp><rt>グラヴィティ</rt><rp>)</rp></ruby>&#8221;</h1>
       <div class="sub">紙をちぎった枚数から握力を推定します</div>
     </header>
 
@@ -1234,13 +1241,13 @@
       if (!window._lastResult) return;
       const { sheets, grip, animal } = window._lastResult;
       const text = [
-        '紙ちぎり握力チェッカーの結果',
+        '紙ちぎり握力チェッカー"寿(グラヴィティ)"の結果',
         '',
         `ちぎった紙: ${sheets}枚`,
         `推定握力: ${grip}kg`,
         `ぎりぎり負ける動物: ${animal.emoji} ${animal.name}（${animal.grip}kg）`,
         '',
-        '#紙ちぎり握力チェッカー',
+        '#紙ちぎり握力チェッカー寿',
       ].join('\n');
 
       navigator.clipboard.writeText(text).then(() => {
