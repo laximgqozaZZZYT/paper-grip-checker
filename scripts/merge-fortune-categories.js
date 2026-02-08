@@ -21,6 +21,7 @@ gitCategories.forEach((q) => {
 function inferCategory(q) {
   const a = q.author || '';
   const t = (q.text || '') + ' ' + a;
+  if (/中国のことわざ/.test(a)) return '中国のことわざ';
   if (/ことわざ|の国/.test(a)) return '世界のことわざ';
   if (/俳句|芭蕉|一茶|子規|蕪村|山口誓子|秋桜子|虚子|加藤楸邨|杉田久女|種田山頭火|万葉|短歌|和歌|柿本人麻呂|持統天皇|山上憶良|紫式部|藤原定家|西行|式子内親王/.test(a)) return '詩歌（俳句・和歌・漢詩・川柳）';
   if (/漢詩|李白|蘇軾|禅語|雲門|実語教|于武陵|劉希夷|陳子昂|魏徴/.test(a)) return '漢詩';
