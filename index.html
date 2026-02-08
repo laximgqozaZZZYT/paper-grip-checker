@@ -15,8 +15,8 @@
 
     body {
       font-family: -apple-system, 'Hiragino Kaku Gothic ProN', 'メイリオ', sans-serif;
-      background: #f5f5f5;
-      color: #333;
+      background: #0f0f0f;
+      color: #e8e0d4;
       min-height: 100vh;
     }
 
@@ -34,22 +34,26 @@
     .header h1 {
       font-size: 1.6rem;
       font-weight: 900;
+      letter-spacing: 0.08em;
+      color: #c9a96e;
       margin-bottom: 0.3rem;
     }
 
     .header .sub {
       font-size: 0.85rem;
-      color: #888;
+      color: #777;
+      letter-spacing: 0.05em;
     }
 
     /* Input */
     .input-area {
-      background: #fff;
-      border: 2px solid #ddd;
-      border-radius: 8px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(201,169,110,0.25);
+      border-radius: 12px;
       padding: 1.5rem;
       text-align: center;
       margin-bottom: 1.5rem;
+      backdrop-filter: blur(8px);
     }
 
     .input-area label {
@@ -57,6 +61,8 @@
       font-size: 1rem;
       font-weight: 700;
       margin-bottom: 1rem;
+      color: #d4c5a9;
+      letter-spacing: 0.04em;
     }
 
     .input-row {
@@ -73,40 +79,45 @@
       font-size: 1.8rem;
       font-weight: 900;
       text-align: center;
-      border: 2px solid #ccc;
-      border-radius: 6px;
+      border: 1px solid rgba(201,169,110,0.35);
+      border-radius: 8px;
       outline: none;
       font-family: inherit;
+      background: rgba(255,255,255,0.06);
+      color: #e8e0d4;
     }
 
     .sheets-input:focus {
-      border-color: #e74c3c;
+      border-color: #c9a96e;
+      box-shadow: 0 0 0 2px rgba(201,169,110,0.15);
     }
 
     .unit {
       font-size: 1.2rem;
       font-weight: 700;
-      color: #666;
+      color: #888;
     }
 
     .check-btn {
-      background: #e74c3c;
-      color: #fff;
+      background: linear-gradient(135deg, #c9a96e, #a8893e);
+      color: #1a1a1a;
       border: none;
       padding: 0.8rem 2rem;
-      border-radius: 6px;
+      border-radius: 8px;
       font-size: 1.1rem;
       font-weight: 700;
       font-family: inherit;
       cursor: pointer;
+      letter-spacing: 0.05em;
+      transition: opacity 0.2s;
     }
 
     .check-btn:hover {
-      background: #c0392b;
+      opacity: 0.88;
     }
 
     .check-btn:active {
-      background: #a93226;
+      opacity: 0.75;
     }
 
     /* Results */
@@ -119,37 +130,40 @@
     }
 
     .result-box {
-      background: #fff;
-      border: 2px solid #ddd;
-      border-radius: 8px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(201,169,110,0.2);
+      border-radius: 12px;
       padding: 1.5rem;
       margin-bottom: 1rem;
       text-align: center;
+      backdrop-filter: blur(8px);
     }
 
     .result-box .label {
       font-size: 0.8rem;
-      color: #999;
+      color: #888;
       margin-bottom: 0.3rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
     }
 
     /* Grip */
     .grip-num {
       font-size: 3.5rem;
       font-weight: 900;
-      color: #e74c3c;
+      color: #c9a96e;
       line-height: 1.1;
     }
 
     .grip-kg {
       font-size: 1.2rem;
       font-weight: 700;
-      color: #999;
+      color: #777;
     }
 
     .grip-bar-wrap {
       margin-top: 1rem;
-      background: #eee;
+      background: rgba(255,255,255,0.08);
       border-radius: 4px;
       height: 16px;
       overflow: hidden;
@@ -158,7 +172,7 @@
     .grip-bar {
       height: 100%;
       border-radius: 4px;
-      background: #e74c3c;
+      background: linear-gradient(90deg, #a8893e, #c9a96e);
       transition: width 1s ease;
       width: 0%;
     }
@@ -167,7 +181,7 @@
       display: flex;
       justify-content: space-between;
       font-size: 0.7rem;
-      color: #bbb;
+      color: #666;
       margin-top: 2px;
     }
 
@@ -178,6 +192,10 @@
       justify-content: center;
       gap: 0.8rem;
       margin: 0.8rem 0;
+    }
+
+    .animal-vs .emoji-float {
+      filter: drop-shadow(0 0 12px rgba(201,169,110,0.5)) drop-shadow(0 4px 8px rgba(0,0,0,0.5));
     }
 
     .animal-vs .you {
@@ -322,7 +340,8 @@
     .animal-vs .vs {
       font-weight: 900;
       font-size: 1rem;
-      color: #e74c3c;
+      color: #c9a96e;
+      letter-spacing: 0.1em;
     }
 
     .animal-vs .them {
@@ -332,35 +351,38 @@
     .animal-name {
       font-size: 1.5rem;
       font-weight: 900;
+      color: #e8e0d4;
     }
 
     .animal-grip-tag {
       display: inline-block;
-      background: #f0f0f0;
+      background: rgba(201,169,110,0.12);
       padding: 0.2rem 0.8rem;
       border-radius: 4px;
       font-size: 0.8rem;
       font-weight: 700;
-      color: #666;
+      color: #b89d5c;
       margin: 0.4rem 0;
+      border: 1px solid rgba(201,169,110,0.2);
     }
 
 
     .animal-trivia {
       font-size: 0.8rem;
-      color: #666;
+      color: #999;
       margin-top: 0.6rem;
       padding: 0.5rem 0.8rem;
-      background: #f9f9f9;
-      border-radius: 4px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 6px;
       text-align: center;
       font-style: italic;
       line-height: 1.5;
+      border: 1px solid rgba(255,255,255,0.05);
     }
 
     .animal-deaths {
       font-size: 0.75rem;
-      color: #999;
+      color: #666;
       margin-top: 0.4rem;
     }
 
@@ -374,31 +396,32 @@
 
     .retry-btn, .share-btn {
       padding: 0.6rem 1.2rem;
-      border-radius: 6px;
+      border-radius: 8px;
       font-size: 0.9rem;
       font-weight: 700;
       font-family: inherit;
       cursor: pointer;
+      transition: opacity 0.2s;
     }
 
     .retry-btn {
-      background: #fff;
-      border: 2px solid #ddd;
-      color: #666;
+      background: transparent;
+      border: 1px solid rgba(201,169,110,0.35);
+      color: #c9a96e;
     }
 
     .retry-btn:hover {
-      border-color: #999;
+      border-color: #c9a96e;
     }
 
     .share-btn {
-      background: #333;
-      border: none;
-      color: #fff;
+      background: rgba(201,169,110,0.15);
+      border: 1px solid rgba(201,169,110,0.3);
+      color: #c9a96e;
     }
 
     .share-btn:hover {
-      background: #555;
+      background: rgba(201,169,110,0.25);
     }
 
     .copied-toast {
@@ -406,10 +429,10 @@
       bottom: 2rem;
       left: 50%;
       transform: translateX(-50%) translateY(100px);
-      background: #333;
-      color: #fff;
+      background: #c9a96e;
+      color: #1a1a1a;
       padding: 0.6rem 1.2rem;
-      border-radius: 6px;
+      border-radius: 8px;
       font-weight: 700;
       font-size: 0.85rem;
       transition: transform 0.3s;
@@ -424,7 +447,7 @@
       text-align: center;
       margin-top: 2rem;
       font-size: 0.75rem;
-      color: #bbb;
+      color: #555;
     }
 
     .ad-area {
@@ -476,9 +499,9 @@
       <div class="result-box">
         <div class="label">ぎりぎり負ける動物</div>
         <div class="animal-vs">
-          <span class="you split-1"><span class="you-l">🧑</span><span class="you-r">🧑</span><span class="you-c">🧑</span><span class="you-d">🧑</span></span>
+          <span class="you split-1 emoji-float"><span class="you-l">🧑</span><span class="you-r">🧑</span><span class="you-c">🧑</span><span class="you-d">🧑</span></span>
           <span class="vs">VS</span>
-          <span class="them" id="animalEmoji">🐱</span>
+          <span class="them emoji-float" id="animalEmoji">🐱</span>
         </div>
         <div class="animal-name" id="animalName">ネコ</div>
         <div class="animal-grip-tag" id="animalGrip">握力 5kg</div>
@@ -1070,7 +1093,7 @@
         'torn-1','torn-2','torn-3','torn-4','torn-5','torn-6',
         'punch-1','punch-2','punch-3','punch-4','punch-5','punch-6',
       ];
-      youEl.className = 'you ' + effects[Math.floor(Math.random() * effects.length)];
+      youEl.className = 'you emoji-float ' + effects[Math.floor(Math.random() * effects.length)];
 
       // Animal
       document.getElementById('animalEmoji').textContent = animal.emoji;
